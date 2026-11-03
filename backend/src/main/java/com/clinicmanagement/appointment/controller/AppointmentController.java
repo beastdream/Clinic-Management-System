@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -32,6 +33,7 @@ public class AppointmentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN', 'DOCTOR')")
     @Operation(summary = "Đặt lịch hẹn khám mới", description = "Tạo mới lịch hẹn khám, kiểm tra khóa ngoại và kiểm tra trùng lịch")
     public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(@Valid @RequestBody CreateAppointmentRequest request) {
         AppointmentResponse response = appointmentService.createAppointment(request);
@@ -40,6 +42,7 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{id}/check-in")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN')")
     @Operation(summary = "Tiếp đón bệnh nhân (Check-in)", description = "Chuyển trạng thái lịch hẹn sang CHECKED_IN")
     public ResponseEntity<ApiResponse<AppointmentResponse>> checkIn(@PathVariable String id) {
         AppointmentResponse response = appointmentService.checkInAppointment(id);
@@ -47,6 +50,7 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{id}/complete")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'RECEPTIONIST', 'ADMIN')")
     @Operation(summary = "Hoàn thành lượt khám", description = "Chuyển trạng thái lịch hẹn sang COMPLETED")
     public ResponseEntity<ApiResponse<AppointmentResponse>> complete(@PathVariable String id) {
         AppointmentResponse response = appointmentService.completeAppointment(id);
@@ -54,6 +58,7 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN', 'DOCTOR')")
     @Operation(summary = "Hủy lịch hẹn", description = "Chuyển trạng thái lịch hẹn sang CANCELLED và lưu lý do hủy")
     public ResponseEntity<ApiResponse<AppointmentResponse>> cancel(
             @PathVariable String id,
@@ -65,6 +70,7 @@ public class AppointmentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'DOCTOR', 'ADMIN', 'CASHIER', 'PATIENT')")
     @Operation(summary = "Danh sách lịch hẹn khám (Phân trang và lọc)", description = "Lấy danh sách lịch hẹn theo ngày, trạng thái, bác sĩ hoặc bệnh nhân")
     public ResponseEntity<ApiResponse<PageResponse<AppointmentResponse>>> getAppointments(
             @RequestParam(required = false) String status,
@@ -82,6 +88,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/recent")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'DOCTOR', 'ADMIN', 'CASHIER')")
     @Operation(summary = "Danh sách lịch hẹn gần đây", description = "Lấy nhanh tối đa 50 lịch hẹn phục vụ hiển thị Dashboard")
     public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getRecentAppointments() {
         List<AppointmentResponse> list = appointmentService.getRecentAppointments();
@@ -89,6 +96,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'DOCTOR', 'ADMIN', 'CASHIER', 'PATIENT')")
     @Operation(summary = "Xem chi tiết lịch hẹn", description = "Tra cứu chi tiết lịch hẹn theo UUID")
     public ResponseEntity<ApiResponse<AppointmentResponse>> getAppointmentById(@PathVariable String id) {
         AppointmentResponse response = appointmentService.getAppointmentById(id);

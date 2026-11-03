@@ -162,6 +162,11 @@ powershell -ExecutionPolicy Bypass -File "scripts/verify_clinical_encounter.ps1"
 powershell -ExecutionPolicy Bypass -File "scripts/verify_billing_module.ps1"
 ```
 
+Để chạy kịch bản kiểm thử Tự động Dashboard Thống kê & Phân quyền RBAC (401 Unauthenticated -> Đối soát số liệu MySQL -> 403 Forbidden Admin chặn bệnh án -> Bác sĩ/Thu ngân/Tiếp tân kiểm tra quyền):
+```powershell
+powershell -ExecutionPolicy Bypass -File "scripts/verify_dashboard_and_rbac.ps1"
+```
+
 Để kiểm tra biên dịch TypeScript strict mode và đóng gói Frontend:
 ```powershell
 cd "d:\Clinic Management System\frontend"

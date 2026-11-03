@@ -175,3 +175,11 @@
 | `GET` | `/api/v1/notifications` | Lấy danh sách thông báo của người dùng hiện tại | Authenticated |
 | `PUT` | `/api/v1/notifications/{id}/read` | Đánh dấu thông báo đã đọc | Authenticated |
 | `GET` | `/api/v1/audit-logs` | Quản trị viên tra cứu nhật ký kiểm toán hệ thống | `AUDIT_LOG:VIEW` (`ROLE_ADMIN`) |
+
+---
+
+### 2.9. Phân hệ Thống kê Bảng điều khiển (Dashboard Domain)
+
+| Phương thức | Đường dẫn URL | Mô tả nghiệp vụ | Quyền hạn |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/dashboard/stats` | Thống kê số liệu thời gian thực từ MySQL: Tổng bệnh nhân, bác sĩ, lịch hẹn hôm nay, hàng chờ, lượt khám hoàn tất, doanh thu viện phí, phân bố trạng thái và hoạt động theo ngày | `Authenticated` (`ROLE_ADMIN`, `ROLE_DOCTOR`, `ROLE_RECEPTIONIST`, `ROLE_CASHIER`, `ROLE_PATIENT`) |

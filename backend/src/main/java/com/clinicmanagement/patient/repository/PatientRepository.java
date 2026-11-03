@@ -39,4 +39,6 @@ public interface PatientRepository extends JpaRepository<Patient, String> {
             "p.phone LIKE CONCAT('%', :search, '%') OR " +
             "LOWER(p.patientCode) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<Patient> searchActivePatientsList(@Param("search") String search);
+
+    long countByDeletedAtIsNull();
 }

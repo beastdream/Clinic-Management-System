@@ -74,7 +74,6 @@ public class SecurityConfig {
                                 "/actuator/health"
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/patients/**", "/api/v1/appointments/**").permitAll()
 
                         // Clinical Privacy Rule: ADMIN không tự ý đọc hồ sơ bệnh án
                         .requestMatchers("/api/v1/clinical/**").hasAnyRole("DOCTOR", "PATIENT", "RECEPTIONIST")

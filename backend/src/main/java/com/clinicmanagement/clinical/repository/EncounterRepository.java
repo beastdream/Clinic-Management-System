@@ -41,5 +41,7 @@ public interface EncounterRepository extends JpaRepository<Encounter, String> {
             @Param("search") String search,
             Pageable pageable
     );
+
+    long countByDeletedAtIsNullAndStatus(String status);
 }
 

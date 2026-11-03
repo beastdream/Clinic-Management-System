@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class PatientController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN', 'DOCTOR')")
     @Operation(summary = "Đăng ký hồ sơ bệnh nhân mới", description = "Tạo mới hồ sơ hành chính, tự động sinh mã BN-YYYY-XXXX")
     public ResponseEntity<ApiResponse<PatientResponse>> createPatient(@Valid @RequestBody CreatePatientRequest request) {
         PatientResponse response = patientService.createPatient(request);
@@ -38,6 +40,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN', 'DOCTOR')")
     @Operation(summary = "Cập nhật hồ sơ bệnh nhân", description = "Chỉnh sửa thông tin hành chính, liên hệ và tiền sử bệnh nhân")
     public ResponseEntity<ApiResponse<PatientResponse>> updatePatient(
             @PathVariable String id,
@@ -48,6 +51,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN')")
     @Operation(summary = "Lưu trữ hồ sơ bệnh nhân (Soft Delete)", description = "Đánh dấu hồ sơ vào trạng thái ARCHIVED, không xóa vật lý khỏi CSDL")
     public ResponseEntity<ApiResponse<Void>> deletePatient(@PathVariable String id) {
         patientService.softDeletePatient(id);
@@ -55,6 +59,7 @@ public class PatientController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN', 'DOCTOR', 'CASHIER', 'PATIENT')")
     @Operation(summary = "Danh sách bệnh nhân (Phân trang và Tìm kiếm)", description = "Lấy danh sách hồ sơ bệnh nhân theo trang, hỗ trợ tìm kiếm theo tên, SĐT, mã BN")
     public ResponseEntity<ApiResponse<PageResponse<PatientResponse>>> getPatients(
             @RequestParam(required = false) String search,
@@ -69,6 +74,7 @@ public class PatientController {
     }
 
     @GetMapping("/top")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN', 'DOCTOR', 'CASHIER', 'PATIENT')")
     @Operation(summary = "Lấy nhanh danh sách bệnh nhân", description = "Lấy tối đa 50 bệnh nhân để phục vụ hiển thị nhanh, hỗ trợ tìm kiếm")
     public ResponseEntity<ApiResponse<List<PatientResponse>>> getTopPatients(
             @RequestParam(required = false) String search
@@ -78,6 +84,7 @@ public class PatientController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST', 'ADMIN', 'DOCTOR', 'CASHIER', 'PATIENT')")
     @Operation(summary = "Xem chi tiết hồ sơ bệnh nhân", description = "Tra cứu hồ sơ bệnh nhân theo UUID")
     public ResponseEntity<ApiResponse<PatientResponse>> getPatientById(@PathVariable String id) {
         PatientResponse response = patientService.getPatientById(id);

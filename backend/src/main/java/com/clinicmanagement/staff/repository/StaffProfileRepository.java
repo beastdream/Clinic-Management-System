@@ -2,6 +2,7 @@ package com.clinicmanagement.staff.repository;
 
 import com.clinicmanagement.staff.entity.StaffProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -14,4 +15,7 @@ public interface StaffProfileRepository extends JpaRepository<StaffProfile, Stri
     Optional<StaffProfile> findByStaffCode(String staffCode);
 
     boolean existsByStaffCode(String staffCode);
+
+    @Query("SELECT COUNT(s) FROM StaffProfile s WHERE s.staffCode LIKE 'NV-BS%'")
+    long countDoctors();
 }
