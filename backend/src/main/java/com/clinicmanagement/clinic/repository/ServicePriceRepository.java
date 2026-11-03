@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface ServicePriceRepository extends JpaRepository<ServicePrice, String> {
     List<ServicePrice> findByServiceIdAndActiveTrue(String serviceId);
+    java.util.Optional<ServicePrice> findFirstByServiceIdAndActiveTrueOrderByEffectiveFromDesc(String serviceId);
 }
 

@@ -6,6 +6,7 @@ import { PatientsPage } from '@/pages/PatientsPage';
 import { AppointmentsPage } from '@/pages/AppointmentsPage';
 import { DoctorsPage } from '@/pages/DoctorsPage';
 import { ClinicalEncountersPage } from '@/pages/clinical/ClinicalEncountersPage';
+import { BillingInvoicesPage } from '@/pages/billing/BillingInvoicesPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="appointments" element={<AppointmentsPage />} />
         <Route path="doctors" element={<DoctorsPage />} />
         <Route path="clinical" element={<ClinicalEncountersPage />} />
+        <Route path="billing" element={<BillingInvoicesPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

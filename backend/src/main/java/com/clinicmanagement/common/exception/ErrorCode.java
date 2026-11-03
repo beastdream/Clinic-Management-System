@@ -33,6 +33,13 @@ public enum ErrorCode {
     ENCOUNTER_ALREADY_EXISTS("ENCOUNTER_ALREADY_EXISTS", "Lịch hẹn này đã có lượt khám đang xử lý hoặc hoàn tất", HttpStatus.CONFLICT),
     MEDICINE_NOT_FOUND("MEDICINE_NOT_FOUND", "Không tìm thấy thuốc yêu cầu", HttpStatus.NOT_FOUND),
     INSUFFICIENT_MEDICINE_STOCK("INSUFFICIENT_MEDICINE_STOCK", "Số lượng thuốc tồn kho không đủ để xuất", HttpStatus.BAD_REQUEST),
+    // Billing domain errors
+    INVOICE_NOT_FOUND("INVOICE_NOT_FOUND", "Không tìm thấy thông tin hóa đơn", HttpStatus.NOT_FOUND),
+    INVOICE_ALREADY_PAID("INVOICE_ALREADY_PAID", "Hóa đơn đã được thanh toán trước đó", HttpStatus.BAD_REQUEST),
+    INVOICE_ALREADY_CANCELLED("INVOICE_ALREADY_CANCELLED", "Hóa đơn đã bị hủy, không thể thực hiện giao dịch", HttpStatus.BAD_REQUEST),
+    INVOICE_CANNOT_BE_CANCELLED("INVOICE_CANNOT_BE_CANCELLED", "Không thể hủy hóa đơn đã thanh toán", HttpStatus.BAD_REQUEST),
+    SERVICE_PRICE_NOT_FOUND("SERVICE_PRICE_NOT_FOUND", "Không tìm thấy bảng giá khả dụng cho dịch vụ yêu cầu", HttpStatus.NOT_FOUND),
+    INVALID_PAYMENT_AMOUNT("INVALID_PAYMENT_AMOUNT", "Số tiền thanh toán không hợp lệ", HttpStatus.BAD_REQUEST),
     INVALID_STATE_TRANSITION("INVALID_STATE_TRANSITION", "Trạng thái nghiệp vụ chuyển đổi không hợp lệ", HttpStatus.BAD_REQUEST);
 
     private final String code;

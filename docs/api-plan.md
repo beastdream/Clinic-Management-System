@@ -158,12 +158,13 @@
 
 | Phương thức | Đường dẫn URL | Mô tả nghiệp vụ | Quyền hạn |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/billing/invoices` | Danh sách hóa đơn viện phí (tìm kiếm theo BN, ngày) | `INVOICE:READ` |
-| `GET` | `/api/v1/billing/invoices/{id}` | Xem chi tiết các khoản phí dịch vụ và tiền thuốc | `INVOICE:READ` |
-| `POST` | `/api/v1/billing/invoices` | Tạo hóa đơn viện phí thủ công tại quầy | `INVOICE:CREATE` |
-| `POST` | `/api/v1/billing/invoices/{id}/payments` | Ghi nhận thanh toán (tiền mặt/POS/chuyển khoản) | `INVOICE:PAY` (`ROLE_CASHIER`) |
-| `POST` | `/api/v1/billing/payments/{id}/refund` | Thực hiện hoàn tiền cho bệnh nhân | `INVOICE:REFUND` |
-| `GET` | `/api/v1/billing/reports/daily-revenue` | Báo cáo doanh thu thu ngân cuối ngày | `FINANCIAL_REPORT:VIEW` |
+| `GET` | `/api/v1/billing/invoices` | Danh sách hóa đơn viện phí (phân trang, lọc trạng thái, ngày, tìm kiếm BN) | `ROLE_CASHIER`, `ROLE_ADMIN`, `ROLE_RECEPTIONIST`, `ROLE_PATIENT` |
+| `GET` | `/api/v1/billing/invoices/{id}` | Xem chi tiết các khoản phí dịch vụ kỹ thuật và lịch sử thanh toán | `ROLE_CASHIER`, `ROLE_ADMIN`, `ROLE_RECEPTIONIST`, `ROLE_PATIENT` |
+| `GET` | `/api/v1/billing/invoices/summary` | Báo cáo tổng hợp doanh thu thực thu, tiền nợ chưa thanh toán, số lượng HĐ | `ROLE_CASHIER`, `ROLE_ADMIN` |
+| `GET` | `/api/v1/billing/invoices/services` | Danh mục dịch vụ khám kỹ thuật kèm bảng giá hiện hành từ MySQL | `ROLE_CASHIER`, `ROLE_ADMIN`, `ROLE_RECEPTIONIST` |
+| `POST` | `/api/v1/billing/invoices` | Lập hóa đơn viện phí (tính tổng chi phí server-side, `DECIMAL(15, 2)`) | `ROLE_CASHIER`, `ROLE_ADMIN`, `ROLE_RECEPTIONIST` |
+| `POST` | `/api/v1/billing/invoices/{id}/pay` | Ghi nhận thanh toán giả lập (`CASH` hoặc `BANK_TRANSFER`, chống thanh toán trùng) | `ROLE_CASHIER`, `ROLE_ADMIN` |
+| `POST` | `/api/v1/billing/invoices/{id}/cancel` | Hủy hóa đơn (ghi nhận lý do hủy, loại trừ doanh thu, chặn thanh toán tiếp) | `ROLE_CASHIER`, `ROLE_ADMIN` |
 
 ---
 

@@ -106,6 +106,8 @@ Khi ứng dụng khởi động:
   - `V3__init_patient_appointment_queue.sql` (Lược đồ Lịch hẹn và Hàng chờ tiếp đón).
   - `V4__seed_comprehensive_demo_data.sql` (25 bệnh nhân, 5 bác sĩ, 25 lịch hẹn, 15 thuốc mẫu).
   - `V5__init_clinical_encounters.sql` (Bảng lượt khám lâm sàng, sinh hiệu, chẩn đoán, khóa an toàn).
+  - `V6__init_billing_invoices.sql` (Hóa đơn viện phí, chi tiết dịch vụ, thanh toán tiền mặt/chuyển khoản).
+  - `V7__add_updated_at_to_payments.sql` (Bổ sung audit column cho bảng payments).
 - **Backend API**: `http://localhost:8080/api/v1`
 - **Tài liệu Swagger UI**: `http://localhost:8080/swagger-ui.html`
 - **Health Check Endpoint**: `http://localhost:8080/api/v1/health`
@@ -123,6 +125,7 @@ Truy cập giao diện: `http://localhost:5173`
 - Trang Quản lý Lịch hẹn & Tiếp đón: `http://localhost:5173/appointments`
 - Trang Đội ngũ Bác sĩ: `http://localhost:5173/doctors`
 - Trang Khám bệnh & Bệnh án Lâm sàng: `http://localhost:5173/clinical`
+- Trang Thu ngân & Viện phí (Billing): `http://localhost:5173/billing`
 
 ---
 
@@ -152,6 +155,11 @@ mvn test
 Để chạy kịch bản kiểm thử End-to-End tự động luồng Khám bệnh Lâm sàng (Check-in -> Queue -> Start Encounter -> Save Draft -> Complete -> Security Check):
 ```powershell
 powershell -ExecutionPolicy Bypass -File "scripts/verify_clinical_encounter.ps1"
+```
+
+Để chạy kịch bản kiểm thử End-to-End tự động luồng Thu ngân & Viện phí (Lập hóa đơn -> Tính viện phí server-side -> Thanh toán Tiền mặt/Chuyển khoản -> Chống thanh toán trùng -> Hủy hóa đơn -> Đối soát doanh thu):
+```powershell
+powershell -ExecutionPolicy Bypass -File "scripts/verify_billing_module.ps1"
 ```
 
 Để kiểm tra biên dịch TypeScript strict mode và đóng gói Frontend:

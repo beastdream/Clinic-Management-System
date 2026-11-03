@@ -44,14 +44,13 @@
 
 | STT | Hạng mục / Tính năng | Vai trò liên quan | Trạng thái |
 | :---: | :--- | :--- | :---: |
-| 3.1 | Flyway Migration `V2__init_patient_appointment_queue.sql` | Developer | `NOT STARTED` |
-| 3.2 | Quản lý Hồ sơ Bệnh nhân (Tìm kiếm CCCD/SĐT, Sinh mã `BN-XXX`)| RECEPTIONIST, DOCTOR | `NOT STARTED` |
-| 3.3 | Quản lý Ca trực Bác sĩ theo Ngày/Phòng (`doctor_schedules`) | ADMIN, RECEPTIONIST | `NOT STARTED` |
-| 3.4 | Đặt lịch hẹn Khám bệnh (Tại quầy / Qua điện thoại / Online) | RECEPTIONIST, PATIENT | `NOT STARTED` |
-| 3.5 | Tiếp đón & Check-in Bệnh nhân tại quầy | RECEPTIONIST | `NOT STARTED` |
-| 3.6 | Điều phối Hàng chờ Phòng khám (Cấp STT, Hàng chờ ưu tiên) | RECEPTIONIST, DOCTOR | `NOT STARTED` |
-| 3.7 | Màn hình Bảng điện tử Hàng chờ (Queue Display Board) | RECEPTIONIST, PATIENT | `NOT STARTED` |
-| 3.8 | Xử lý Hủy lịch hẹn & Đánh dấu No-Show tự động | RECEPTIONIST, SYSTEM | `NOT STARTED` |
+| 3.1 | Flyway Migration `V3__init_patient_appointment_queue.sql` & `V4__seed_comprehensive_demo_data.sql` | Developer | `COMPLETE` |
+| 3.2 | Quản lý Hồ sơ Bệnh nhân (Tìm kiếm CCCD/SĐT, Sinh mã `BN-XXX`)| RECEPTIONIST, DOCTOR | `COMPLETE` |
+| 3.3 | Quản lý Bác sĩ & Chuyên khoa (`/doctors`) | ADMIN, RECEPTIONIST | `COMPLETE` |
+| 3.4 | Đặt lịch hẹn Khám bệnh (Tại quầy / Qua điện thoại / Lọc chuyên khoa) | RECEPTIONIST, PATIENT | `COMPLETE` |
+| 3.5 | Tiếp đón & Check-in Bệnh nhân tại quầy | RECEPTIONIST | `COMPLETE` |
+| 3.6 | Điều phối Hàng chờ Phòng khám (Cấp STT, Hàng chờ tiếp đón) | RECEPTIONIST, DOCTOR | `COMPLETE` |
+| 3.7 | Xử lý Hủy lịch hẹn & Đổi trạng thái lịch hẹn | RECEPTIONIST, SYSTEM | `COMPLETE` |
 
 ---
 
@@ -59,15 +58,13 @@
 
 | STT | Hạng mục / Tính năng | Vai trò liên quan | Trạng thái |
 | :---: | :--- | :--- | :---: |
-| 4.1 | Flyway Migration `V3__init_clinical_domain.sql` | Developer | `NOT STARTED` |
-| 4.2 | Bắt đầu Lượt khám (`Encounter: IN_PROGRESS`) từ Hàng chờ | DOCTOR | `NOT STARTED` |
-| 4.3 | Đo đạc & Ghi nhận Chỉ số Sinh hiệu (Vitals, BMI tự động tính) | DOCTOR, RECEPTIONIST | `NOT STARTED` |
-| 4.4 | Khám lâm sàng & Chẩn đoán Mã bệnh chuẩn **ICD-10** | DOCTOR | `NOT STARTED` |
-| 4.5 | Chỉ định Cận lâm sàng (Xét nghiệm, X-Quang, Siêu âm) | DOCTOR | `NOT STARTED` |
-| 4.6 | Cập nhật Kết quả Cận lâm sàng & Đính kèm file hình ảnh/PDF | DOCTOR | `NOT STARTED` |
-| 4.7 | Kê đơn thuốc điện tử (Tra cứu hoạt chất, kiểm tra liều & tồn kho) | DOCTOR | `NOT STARTED` |
-| 4.8 | Hoàn thành Lượt khám & Khóa bệnh án chống chỉnh sửa bất hợp pháp| DOCTOR | `NOT STARTED` |
-| 4.9 | Rào cản Bảo mật: Chặn Admin đọc Bệnh án lâm sàng | ADMIN, DOCTOR | `NOT STARTED` |
+| 4.1 | Flyway Migration `V5__init_clinical_encounters.sql` | Developer | `COMPLETE` |
+| 4.2 | Bắt đầu Lượt khám (`Encounter: IN_PROGRESS`) từ Hàng chờ tiếp đón | DOCTOR | `COMPLETE` |
+| 4.3 | Đo đạc & Ghi nhận Chỉ số Sinh hiệu (Vitals, BMI tự động tính) | DOCTOR, RECEPTIONIST | `COMPLETE` |
+| 4.4 | Khám lâm sàng & Chẩn đoán Mã bệnh chuẩn **ICD-10** | DOCTOR | `COMPLETE` |
+| 4.5 | Chỉ định điều trị, ghi chú thăm khám & hướng xử trí | DOCTOR | `COMPLETE` |
+| 4.6 | Hoàn thành Lượt khám & Khóa bệnh án chống chỉnh sửa bất hợp pháp| DOCTOR | `COMPLETE` |
+| 4.7 | Rào cản Bảo mật: Chặn Admin đọc Bệnh án lâm sàng | ADMIN, DOCTOR | `COMPLETE` |
 
 ---
 
@@ -90,14 +87,14 @@
 
 | STT | Hạng mục / Tính năng | Vai trò liên quan | Trạng thái |
 | :---: | :--- | :--- | :---: |
-| 6.1 | Flyway Migration `V5__init_billing_payments.sql` | Developer | `NOT STARTED` |
-| 6.2 | Tự động Tổng hợp Chi phí & Lập Hóa đơn viện phí (`invoices`)| SYSTEM, CASHIER | `NOT STARTED` |
-| 6.3 | Thu tiền Đa phương thức (Tiền mặt, QR Chuyển khoản, POS Thẻ) | CASHIER | `NOT STARTED` |
-| 6.4 | Cơ chế `idempotency_key` chống bấm đúp thanh toán trùng | CASHIER | `NOT STARTED` |
-| 6.5 | Thanh toán Một phần (`PARTIALLY_PAID`) & Quản lý Công nợ | CASHIER | `NOT STARTED` |
-| 6.6 | In Biên lai / Phiếu thu viện phí đạt chuẩn | CASHIER | `NOT STARTED` |
-| 6.7 | Quy trình Hoàn tiền Viện phí (`refunds`) có phê duyệt | CASHIER, ADMIN | `NOT STARTED` |
-| 6.8 | Báo cáo Doanh thu Thu ngân Cuối ca & Đối soát Sổ quỹ | CASHIER, ADMIN | `NOT STARTED` |
+| 6.1 | Flyway Migration `V6__init_billing_invoices.sql` & `V7__add_updated_at_to_payments.sql` | Developer | `COMPLETE` |
+| 6.2 | Tự động Tính toán Viện phí trên Backend (Server-side calculation, `DECIMAL(15, 2)` / `BigDecimal`) | SYSTEM, CASHIER | `COMPLETE` |
+| 6.3 | Thu tiền Đa phương thức (Tiền mặt `CASH`, QR Chuyển khoản `BANK_TRANSFER`) | CASHIER | `COMPLETE` |
+| 6.4 | Cơ chế Chống thanh toán trùng & Chặn thanh toán hóa đơn hủy | CASHIER | `COMPLETE` |
+| 6.5 | Phân loại trạng thái Hóa đơn (`UNPAID`, `PAID`, `CANCELLED`) & Hủy hóa đơn lưu vết | CASHIER, ADMIN | `COMPLETE` |
+| 6.6 | Xem Chi tiết & In Phiếu Hóa đơn viện phí chuẩn y tế (`window.print()`) | CASHIER, PATIENT | `COMPLETE` |
+| 6.7 | Báo cáo Doanh thu Viện phí thực thu (Loại trừ triệt để hóa đơn đã hủy) | CASHIER, ADMIN | `COMPLETE` |
+| 6.8 | Giao diện Quản lý Viện phí React TypeScript (`/billing`) & Phân trang, Lọc theo ngày | CASHIER, RECEPTIONIST, ADMIN | `COMPLETE` |
 
 ---
 
