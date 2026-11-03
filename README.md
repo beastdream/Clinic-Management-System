@@ -102,7 +102,10 @@ mvn spring-boot:run
 Khi ứng dụng khởi động:
 - **Flyway** sẽ tự động thực thi các file migrations:
   - `V1__init_core_schema.sql` (Tạo 18 bảng nền tảng).
-  - `V2__seed_initial_data.sql` (Nạp 6 vai trò, 30 quyền, tài khoản admin, phòng khám, chuyên khoa, phòng và dịch vụ mẫu).
+  - `V2__seed_initial_data.sql` (Nạp vai trò, quyền, admin, phòng khám, chuyên khoa, phòng và dịch vụ mẫu).
+  - `V3__init_patient_appointment_queue.sql` (Lược đồ Lịch hẹn và Hàng chờ tiếp đón).
+  - `V4__seed_comprehensive_demo_data.sql` (25 bệnh nhân, 5 bác sĩ, 25 lịch hẹn, 15 thuốc mẫu).
+  - `V5__init_clinical_encounters.sql` (Bảng lượt khám lâm sàng, sinh hiệu, chẩn đoán, khóa an toàn).
 - **Backend API**: `http://localhost:8080/api/v1`
 - **Tài liệu Swagger UI**: `http://localhost:8080/swagger-ui.html`
 - **Health Check Endpoint**: `http://localhost:8080/api/v1/health`
@@ -116,16 +119,25 @@ npm install
 npm run dev
 ```
 Truy cập giao diện: `http://localhost:5173`
+- Trang Quản lý Bệnh nhân: `http://localhost:5173/patients`
+- Trang Quản lý Lịch hẹn & Tiếp đón: `http://localhost:5173/appointments`
+- Trang Đội ngũ Bác sĩ: `http://localhost:5173/doctors`
+- Trang Khám bệnh & Bệnh án Lâm sàng: `http://localhost:5173/clinical`
 
 ---
 
 ## 4. TÀI KHOẢN MẪU KHỞI TẠO (DEFAULT SEED CREDENTIALS)
 
-Hệ thống đã được nạp sẵn tài khoản Quản trị viên (ADMIN) qua migration `V2`:
+Hệ thống đã được nạp sẵn các tài khoản phân quyền chuẩn theo `AGENTS.md`:
 
-- **Tên đăng nhập (Username / Email / SĐT):** `admin`
-- **Mật khẩu khởi tạo:** `Admin@123456`
-- **Vai trò:** `ADMIN` (Đầy đủ 30 quyền quản trị hệ thống, danh mục, nhân viên)
+| Vai trò | Tên đăng nhập | Mật khẩu | Quyền hạn tiêu biểu |
+| :--- | :--- | :--- | :--- |
+| **Quản trị viên (ADMIN)** | `admin` | `Admin@123456` | Quản trị hệ thống, danh mục, tài khoản, nhân viên (Chặn xem bệnh án) |
+| **Bác sĩ (DOCTOR)** | `bs_minh` | `Doctor@123456` | Xem hàng chờ khám, thăm khám, ghi nhận sinh hiệu, chẩn đoán, hoàn tất bệnh án |
+| **Bác sĩ 2 (DOCTOR)** | `bs_huong` | `Doctor@123456` | Bác sĩ chuyên khoa Nhi |
+| **Tiếp tân (RECEPTIONIST)** | `tieptan_mai` | `Staff@123456` | Đặt lịch khám, Check-in tiếp đón bệnh nhân |
+| **Thu ngân (CASHIER)** | `thungan_hang` | `Staff@123456` | Thu ngân, quản lý thanh toán viện phí |
+| **Bệnh nhân (PATIENT)** | `benhnhan_an` | `Patient@123456` | Cổng thông tin bệnh nhân (Portal), xem bệnh án của chính mình |
 
 ---
 
@@ -135,6 +147,11 @@ Hệ thống đã được nạp sẵn tài khoản Quản trị viên (ADMIN) q
 ```powershell
 cd "d:\Clinic Management System\backend"
 mvn test
+```
+
+Để chạy kịch bản kiểm thử End-to-End tự động luồng Khám bệnh Lâm sàng (Check-in -> Queue -> Start Encounter -> Save Draft -> Complete -> Security Check):
+```powershell
+powershell -ExecutionPolicy Bypass -File "scripts/verify_clinical_encounter.ps1"
 ```
 
 Để kiểm tra biên dịch TypeScript strict mode và đóng gói Frontend:

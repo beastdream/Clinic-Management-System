@@ -28,9 +28,9 @@ const navItems: NavItem[] = [
   { name: 'Hồ sơ Bệnh nhân', href: '/patients', icon: Users, badge: 'Core' },
   { name: 'Lịch hẹn Khám', href: '/appointments', icon: Calendar, badge: 'Core' },
   { name: 'Đội ngũ Bác sĩ', href: '/doctors', icon: Stethoscope, badge: 'Core' },
+  { name: 'Bệnh án & Lâm sàng', href: '/clinical', icon: FileText, badge: 'Core' },
   { name: 'Kho Dược & Thuốc', href: '/#pharmacy', icon: Pill, phase: 'Phase 04' },
   { name: 'Thu ngân & Viện phí', href: '/#billing', icon: CreditCard, phase: 'Phase 05' },
-  { name: 'Bệnh án & Lâm sàng', href: '/#clinical', icon: FileText, phase: 'Phase 03' },
   { name: 'Cổng Bệnh nhân (Portal)', href: '/#portal', icon: Building2, phase: 'Phase 06' },
   { name: 'Cơ sở dữ liệu & Flyway', href: '/#database', icon: Database, phase: 'Phase 01' },
 ];

@@ -28,6 +28,9 @@ public enum ErrorCode {
     APPOINTMENT_NOT_FOUND("APPOINTMENT_NOT_FOUND", "Không tìm thấy lịch hẹn khám", HttpStatus.NOT_FOUND),
     APPOINTMENT_SLOT_CONFLICT("APPOINTMENT_SLOT_CONFLICT", "Bác sĩ đã có lịch hẹn khác vào khung giờ này", HttpStatus.CONFLICT),
     DOCTOR_NOT_FOUND("DOCTOR_NOT_FOUND", "Không tìm thấy thông tin bác sĩ", HttpStatus.NOT_FOUND),
+    ENCOUNTER_NOT_FOUND("ENCOUNTER_NOT_FOUND", "Không tìm thấy thông tin lượt khám", HttpStatus.NOT_FOUND),
+    ENCOUNTER_ALREADY_COMPLETED("ENCOUNTER_ALREADY_COMPLETED", "Lượt khám đã hoàn tất và được khóa an toàn, không thể chỉnh sửa", HttpStatus.BAD_REQUEST),
+    ENCOUNTER_ALREADY_EXISTS("ENCOUNTER_ALREADY_EXISTS", "Lịch hẹn này đã có lượt khám đang xử lý hoặc hoàn tất", HttpStatus.CONFLICT),
     MEDICINE_NOT_FOUND("MEDICINE_NOT_FOUND", "Không tìm thấy thuốc yêu cầu", HttpStatus.NOT_FOUND),
     INSUFFICIENT_MEDICINE_STOCK("INSUFFICIENT_MEDICINE_STOCK", "Số lượng thuốc tồn kho không đủ để xuất", HttpStatus.BAD_REQUEST),
     INVALID_STATE_TRANSITION("INVALID_STATE_TRANSITION", "Trạng thái nghiệp vụ chuyển đổi không hợp lệ", HttpStatus.BAD_REQUEST);

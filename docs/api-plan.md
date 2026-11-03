@@ -123,20 +123,18 @@
 
 ### 2.5. Phân hệ Thăm khám Lâm sàng & Bệnh án (Clinical Domain)
 
-> **Lưu ý bảo mật**: Tất cả API dưới đây bị CHẶN truy cập đối với `ROLE_ADMIN`.
+> **Lưu ý bảo mật**: Tất cả API dưới đây bị CHẶN truy cập đối với `ROLE_ADMIN` (Tuân thủ nguyên tắc số 4 của `AGENTS.md`: Admin không xem bệnh án).
 
 | Phương thức | Đường dẫn URL | Mô tả nghiệp vụ | Quyền hạn |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/clinical/encounters` | Bắt đầu lượt khám mới (`IN_PROGRESS`) | `ENCOUNTER:CREATE` (`ROLE_DOCTOR`) |
-| `GET` | `/api/v1/clinical/encounters/{id}` | Xem chi tiết bệnh án lượt khám | `ENCOUNTER:READ` (Bác sĩ phụ trách hoặc BN) |
-| `PUT` | `/api/v1/clinical/encounters/{id}` | Cập nhật quá trình khám lâm sàng, kết luận | `ENCOUNTER:UPDATE` |
-| `PUT` | `/api/v1/clinical/encounters/{id}/complete` | Hoàn thành lượt khám & khóa bệnh án | `ENCOUNTER:UPDATE` |
-| `POST` | `/api/v1/clinical/encounters/{id}/vitals` | Ghi nhận/cập nhật chỉ số sinh hiệu | `VITALS:RECORD` |
-| `POST` | `/api/v1/clinical/encounters/{id}/diagnoses`| Lưu mã chẩn đoán ICD-10 | `DIAGNOSIS:RECORD` |
-| `POST` | `/api/v1/clinical/encounters/{id}/orders` | Chỉ định dịch vụ Cận lâm sàng (Xét nghiệm/CĐHA) | `LAB_ORDER:CREATE` |
-| `PUT` | `/api/v1/clinical/orders/{orderId}/result` | Kỹ thuật viên nhập kết quả & đính kèm file CLS | `LAB_ORDER:PERFORM` |
-| `POST` | `/api/v1/clinical/encounters/{id}/prescriptions` | Bác sĩ tạo và ký phát hành đơn thuốc điện tử | `PRESCRIPTION:CREATE` |
-| `GET` | `/api/v1/clinical/prescriptions/{id}` | Xem chi tiết đơn thuốc | `PRESCRIPTION:READ` |
+| `GET` | `/api/v1/clinical/encounters/doctor-queue` | Lấy danh sách bệnh nhân chờ khám trong ca trực của bác sĩ (`CHECKED_IN`, `IN_PROGRESS`) | `ROLE_DOCTOR` |
+| `POST` | `/api/v1/clinical/encounters/start-from-appointment/{appointmentId}` | Bắt đầu lượt khám từ Lịch hẹn (`IN_PROGRESS`) | `ROLE_DOCTOR` |
+| `POST` | `/api/v1/clinical/encounters` | Bắt đầu lượt khám mới trực tiếp (`IN_PROGRESS`) | `ROLE_DOCTOR` |
+| `GET` | `/api/v1/clinical/encounters/{id}` | Xem chi tiết bệnh án lượt khám (kiểm tra quyền sở hữu) | `ROLE_DOCTOR` (phụ trách) hoặc `ROLE_PATIENT` (chính chủ) |
+| `PUT` | `/api/v1/clinical/encounters/{id}` | Cập nhật quá trình khám lâm sàng, sinh hiệu, chẩn đoán, hướng xử trí | `ROLE_DOCTOR` (phụ trách) |
+| `POST` | `/api/v1/clinical/encounters/{id}/complete` | Hoàn thành lượt khám, khóa bệnh án an toàn & cập nhật lịch hẹn | `ROLE_DOCTOR` (phụ trách) |
+| `GET` | `/api/v1/clinical/encounters/patient/{patientId}` | Xem lịch sử các lần khám của bệnh nhân | `ROLE_DOCTOR`, `ROLE_PATIENT` |
+| `GET` | `/api/v1/clinical/encounters` | Tìm kiếm và phân trang danh sách phiếu khám | `ROLE_DOCTOR`, `ROLE_PATIENT` |
 
 ---
 

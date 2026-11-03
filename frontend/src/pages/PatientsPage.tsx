@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Users, 
@@ -13,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldAlert,
-  UserCheck
+  UserCheck,
+  Stethoscope
 } from 'lucide-react';
 import { 
   patientService, 
@@ -28,6 +30,7 @@ import { Alert } from '@/components/ui/Alert';
 
 export const PatientsPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   // Filter & Pagination state
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -904,7 +907,20 @@ export const PatientsPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-between items-center pt-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const patId = viewingPatient.id;
+                    setViewingPatient(null);
+                    navigate(`/clinical?patientId=${patId}`);
+                  }}
+                  className="gap-1.5 text-xs text-teal-700 border-teal-200 hover:bg-teal-50"
+                >
+                  <Stethoscope className="h-3.5 w-3.5" />
+                  Xem lịch sử khám bệnh
+                </Button>
                 <Button
                   size="sm"
                   variant="outline"

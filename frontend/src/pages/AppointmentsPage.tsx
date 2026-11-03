@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Calendar as CalendarIcon, 
@@ -11,7 +12,8 @@ import {
   Check, 
   Ban, 
   ChevronLeft, 
-  ChevronRight 
+  ChevronRight,
+  Stethoscope
 } from 'lucide-react';
 import { 
   appointmentService, 
@@ -27,6 +29,7 @@ import { Alert } from '@/components/ui/Alert';
 
 export const AppointmentsPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   // Filter state
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -464,6 +467,20 @@ export const AppointmentsPage: React.FC = () => {
                               >
                                 <UserCheck className="h-3 w-3 text-amber-600" />
                                 Check-in
+                              </Button>
+                            )}
+
+                            {/* Clinical Encounter button */}
+                            {(apt.status === 'CHECKED_IN' || apt.status === 'IN_PROGRESS') && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => navigate(`/clinical?appointmentId=${apt.id}`)}
+                                className="h-7 px-2 text-[11px] border-teal-300 text-teal-800 bg-teal-50 hover:bg-teal-100 gap-1"
+                                title="Vào phòng khám bệnh"
+                              >
+                                <Stethoscope className="h-3 w-3 text-teal-600" />
+                                Khám bệnh
                               </Button>
                             )}
 
