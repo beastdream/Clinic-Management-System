@@ -37,6 +37,11 @@
 | 2.8 | Quản lý Danh mục Dịch vụ Kỹ thuật & Bảng giá (`service_prices`)| ADMIN | `COMPLETE` |
 | 2.9 | Khởi tạo React + TypeScript + Vite + Tailwind + shadcn/ui | Developer | `COMPLETE` |
 | 2.10| Auth Layout, Dashboard Layout, Sidebar theo Role | Tất cả | `COMPLETE` |
+| 2.11| Trang Đăng nhập (`/login`) dùng react-hook-form + zod, chuyển hướng về trang trước, đăng xuất về `/login` | Tất cả | `COMPLETE` |
+| 2.12| Bệnh nhân tự đăng ký tài khoản Portal (`POST /api/v1/auth/register`, trang `/register`): tạo User `ROLE_PATIENT` + hồ sơ bệnh nhân + liên kết 1-1, ghi audit | PATIENT | `COMPLETE` |
+| 2.14| Xác thực email khi bệnh nhân đăng ký (Flyway `V8`, token SHA-256 hết hạn 24h, gửi lại có giới hạn 60s, chặn đăng nhập khi chưa xác thực) | PATIENT | `COMPLETE` |
+| 2.15| Đăng ký / đăng nhập bằng Google (Google Identity Services, xác minh ID token ở backend, bổ sung hồ sơ lần đầu, chặn tài khoản nhân viên) | PATIENT | `COMPLETE` (cần cấu hình `GOOGLE_CLIENT_ID`) |
+| 2.13| Ghi audit đăng nhập (LOGIN / LOGIN_FAILED / ACCOUNT_LOCKED) & sửa lỗi rollback khiến không lưu số lần đăng nhập sai | Tất cả | `COMPLETE` |
 
 ---
 

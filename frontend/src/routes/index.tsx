@@ -1,6 +1,12 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import { LoginPage } from '@/pages/auth/LoginPage';
+import { RegisterPage } from '@/pages/auth/RegisterPage';
+import { CheckEmailPage } from '@/pages/auth/CheckEmailPage';
+import { VerifyEmailPage } from '@/pages/auth/VerifyEmailPage';
+import { GoogleCompleteProfilePage } from '@/pages/auth/GoogleCompleteProfilePage';
 import { HealthDashboardPage } from '@/pages/HealthDashboardPage';
 import { PatientsPage } from '@/pages/PatientsPage';
 import { AppointmentsPage } from '@/pages/AppointmentsPage';
@@ -12,6 +18,16 @@ import { RoleGuard } from '@/components/guard/RoleGuard';
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      <Route element={<AuthLayout />}>
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="register/check-email" element={<CheckEmailPage />} />
+        <Route path="register/google" element={<GoogleCompleteProfilePage />} />
+      </Route>
+      <Route element={<AuthLayout redirectIfAuthenticated={false} />}>
+        <Route path="verify-email" element={<VerifyEmailPage />} />
+      </Route>
+
       <Route path="/" element={<DashboardLayout />}>
         {/* Dashboard / Trang chủ: ai cũng truy cập được */}
         <Route index element={<HealthDashboardPage />} />

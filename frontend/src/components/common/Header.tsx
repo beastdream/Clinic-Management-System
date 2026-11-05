@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { 
   Activity, 
   HeartPulse, 
@@ -24,6 +26,9 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   } | null>(null);
 
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryClient = useQueryClient();
 
   const reloadUser = () => {
     const user = authService.getCurrentUser();
@@ -39,8 +44,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
 
   const handleLogout = () => {
     authService.logout();
-    reloadUser();
-    window.location.reload();
+    queryClient.clear();
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -118,8 +123,16 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
             <div className="flex items-center gap-2 border-l border-slate-200 pl-3 text-xs">
               <Button
                 size="sm"
+                variant="outline"
+                onClick={() => navigate('/register')}
+                className="h-8 text-xs hidden sm:inline-flex"
+              >
+                Đăng Ký
+              </Button>
+              <Button
+                size="sm"
                 variant="default"
-                onClick={() => setShowRoleModal(true)}
+                onClick={() => navigate('/login', { state: { from: location.pathname } })}
                 className="h-8 text-xs bg-teal-600 hover:bg-teal-700 text-white gap-1.5"
               >
                 <KeyRound className="h-3.5 w-3.5" />

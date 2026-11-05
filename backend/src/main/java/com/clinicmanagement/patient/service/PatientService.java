@@ -6,7 +6,9 @@ import com.clinicmanagement.patient.dto.CreatePatientRequest;
 import com.clinicmanagement.patient.dto.PatientResponse;
 import com.clinicmanagement.patient.dto.UpdatePatientRequest;
 import com.clinicmanagement.patient.entity.Patient;
+import com.clinicmanagement.patient.entity.PatientUserLink;
 import com.clinicmanagement.patient.repository.PatientRepository;
+import com.clinicmanagement.patient.repository.PatientUserLinkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,9 +26,25 @@ public class PatientService {
     private static final Logger log = LoggerFactory.getLogger(PatientService.class);
 
     private final PatientRepository patientRepository;
+    private final PatientUserLinkRepository patientUserLinkRepository;
 
-    public PatientService(PatientRepository patientRepository) {
+    public PatientService(PatientRepository patientRepository, PatientUserLinkRepository patientUserLinkRepository) {
         this.patientRepository = patientRepository;
+        this.patientUserLinkRepository = patientUserLinkRepository;
+    }
+
+    /**
+     * Liên kết 1-1 hồ sơ bệnh nhân với tài khoản cổng thông tin.
+     */
+    @Transactional
+    public void linkUserAccount(String patientId, String userId) {
+        if (patientUserLinkRepository.existsByPatientId(patientId) || patientUserLinkRepository.existsByUserId(userId)) {
+            throw new BusinessException(ErrorCode.CONFLICT, "Hồ sơ bệnh nhân hoặc tài khoản đã được liên kết trước đó");
+        }
+        PatientUserLink link = new PatientUserLink();
+        link.setPatientId(patientId);
+        link.setUserId(userId);
+        patientUserLinkRepository.save(link);
     }
 
     @Transactional

@@ -62,6 +62,12 @@ public class SecurityConfig {
                         // Public Endpoints
                         .requestMatchers(
                                 "/api/v1/auth/login",
+                                "/api/v1/auth/register",
+                                "/api/v1/auth/verify-email",
+                                "/api/v1/auth/resend-verification",
+                                "/api/v1/auth/providers",
+                                "/api/v1/auth/google",
+                                "/api/v1/auth/google/register",
                                 "/api/v1/auth/refresh",
                                 "/api/v1/health",
                                 "/api/v1/specialties",

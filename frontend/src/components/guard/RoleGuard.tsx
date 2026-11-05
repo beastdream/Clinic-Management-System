@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { authService } from '@/services/authService';
 import { ShieldAlert, ArrowLeft, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -15,6 +15,7 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   allowedRoles,
   deniedMessage,
 }) => {
+  const location = useLocation();
   const currentUser = authService.getCurrentUser();
   const isAuthenticated = authService.isAuthenticated();
 
@@ -32,6 +33,12 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
             Bạn cần đăng nhập với vai trò phù hợp ({allowedRoles.map(r => r.replace('ROLE_', '')).join(', ')}) để truy cập chức năng này.
           </p>
           <div className="mt-6 flex gap-3">
+            <Link to="/login" state={{ from: location.pathname }}>
+              <Button size="sm" className="gap-2">
+                <KeyRound className="h-4 w-4" />
+                Đăng nhập
+              </Button>
+            </Link>
             <Link to="/">
               <Button variant="outline" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />

@@ -14,8 +14,17 @@ public class User extends BaseEntity {
     @Column(name = "username", length = 50, nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password_hash", length = 255, nullable = false)
-    private String passwordHash;
+    @Column(name = "password_hash", length = 255)
+    private String passwordHash; // NULL với tài khoản chỉ đăng nhập bằng Google
+
+    @Column(name = "auth_provider", length = 20, nullable = false)
+    private String authProvider = "LOCAL"; // LOCAL, GOOGLE
+
+    @Column(name = "google_subject", length = 255, unique = true)
+    private String googleSubject;
+
+    @Column(name = "email_verified_at")
+    private Instant emailVerifiedAt;
 
     @Column(name = "email", length = 100, unique = true)
     private String email;
@@ -74,6 +83,34 @@ public class User extends BaseEntity {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(String authProvider) {
+        this.authProvider = authProvider;
+    }
+
+    public String getGoogleSubject() {
+        return googleSubject;
+    }
+
+    public void setGoogleSubject(String googleSubject) {
+        this.googleSubject = googleSubject;
+    }
+
+    public Instant getEmailVerifiedAt() {
+        return emailVerifiedAt;
+    }
+
+    public void setEmailVerifiedAt(Instant emailVerifiedAt) {
+        this.emailVerifiedAt = emailVerifiedAt;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerifiedAt != null;
     }
 
     public String getEmail() {
