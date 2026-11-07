@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { 
@@ -18,7 +18,9 @@ import {
   Settings,
   UserCheck,
   Layers,
-  ShieldAlert
+  ShieldAlert,
+  Pill,
+  Activity
 } from 'lucide-react';
 import { dashboardService } from '@/services/dashboardService';
 import { authService } from '@/services/authService';
@@ -26,11 +28,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/LoadingSkeleton';
-import { RoleSwitcherModal } from '@/components/common/RoleSwitcherModal';
 import { formatDate } from '@/lib/utils';
 
 export const HealthDashboardPage: React.FC = () => {
-  const [showRoleModal, setShowRoleModal] = useState(false);
   const currentUser = authService.getCurrentUser();
   const currentRole = currentUser?.roles?.[0]?.replace('ROLE_', '') || 'GUEST';
 
@@ -86,17 +86,6 @@ export const HealthDashboardPage: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            {currentRole !== 'ADMIN' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowRoleModal(true)}
-                className="bg-white/10 hover:bg-white/20 text-white border-white/20 text-xs font-semibold gap-1.5 h-9 backdrop-blur"
-              >
-                <Sparkles className="h-3.5 w-3.5 text-teal-300" />
-                Đổi vai trò ({currentRole})
-              </Button>
-            )}
             <Button
               variant="outline"
               size="sm"
@@ -419,128 +408,288 @@ export const HealthDashboardPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {/* Action 1: Cài đặt hệ thống (Admin & Quản trị) */}
-          <Link
-            to="/admin/settings"
-            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-teal-100 text-teal-700 group-hover:bg-teal-600 group-hover:text-white transition-colors">
-                <Settings className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 group-hover:text-teal-800">
-                  Cài Đặt Hệ Thống
+          {/* ========================================================================= */}
+          {/* ROLE DOCTOR SHORTCUTS: 100% Chuyên môn lâm sàng, không lẫn quản trị        */}
+          {/* ========================================================================= */}
+          {currentRole === 'DOCTOR' ? (
+            <>
+              {/* Doctor Shortcut 1: Khám bệnh & ICD-10 */}
+              <Link
+                to="/clinical"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-teal-100 text-teal-700 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                    <Stethoscope className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-teal-800">
+                      Khám Bệnh & ICD-10
+                    </div>
+                    <div className="text-[11px] text-slate-500">Mở phiếu khám, chuẩn hóa mã ICD-10</div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-slate-500">Bảo mật & Quản lý tài khoản</div>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
 
-          {/* Action 2: Danh Mục Dùng Chung */}
-          <Link
-            to="/admin/master-data"
-            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                <Layers className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
-                  Danh Mục Dùng Chung
+              {/* Doctor Shortcut 2: Kê đơn thuốc */}
+              <Link
+                to="/clinical"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <Pill className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
+                      Kê Đơn Thuốc Điện Tử
+                    </div>
+                    <div className="text-[11px] text-slate-500">Kê đơn kho dược & cảnh báo dị ứng</div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-slate-500">Chuyên khoa, Phòng, Giá dịch vụ</div>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
 
-          {/* Action 3: Quản Lý Nhân Sự */}
-          <Link
-            to="/admin/staff"
-            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <UserCheck className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 group-hover:text-purple-800">
-                  Quản Lý Nhân Sự
+              {/* Doctor Shortcut 3: Chỉ định CLS */}
+              <Link
+                to="/clinical"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-blue-100 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <Activity className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-blue-800">
+                      Chỉ Định & Kết Quả CLS
+                    </div>
+                    <div className="text-[11px] text-slate-500">Chỉ định xét nghiệm & kết luận</div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-slate-500">Hồ sơ & Phân quyền đa vai trò</div>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
 
-          {/* Action 4: Nhật Ký Kiểm Toán */}
-          <Link
-            to="/admin/audit-logs"
-            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-rose-100 text-rose-700 group-hover:bg-rose-600 group-hover:text-white transition-colors">
-                <ShieldAlert className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 group-hover:text-rose-800">
-                  Nhật Ký Kiểm Toán
+              {/* Doctor Shortcut 4: Hồ sơ bệnh nhân */}
+              <Link
+                to="/patients"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <Users className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-indigo-800">
+                      Hồ Sơ Bệnh Nhân
+                    </div>
+                    <div className="text-[11px] text-slate-500">Tra cứu tiền sử, bệnh án & dị ứng</div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-slate-500">Giám sát an toàn & Audit log</div>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-rose-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
 
-          {/* Action 5: Báo Cáo Quản Trị */}
-          <Link
-            to="/admin/reports"
-            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                <BarChart3 className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 group-hover:text-indigo-800">
-                  Báo Cáo Quản Trị
+              {/* Doctor Shortcut 5: Bệnh án dọc & EMR */}
+              <Link
+                to="/clinical"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-purple-400 hover:bg-purple-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                    <TrendingUp className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-purple-800">
+                      Bệnh Án Dọc & EMR
+                    </div>
+                    <div className="text-[11px] text-slate-500">Biểu đồ sinh hiệu & lịch sử ca khám</div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-slate-500">Thống kê ca khám & Xuất CSV</div>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
 
-          {/* Action 6: Đội ngũ Bác sĩ */}
-          <Link
-            to="/doctors"
-            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:bg-sky-50/40 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-sky-100 text-sky-700 group-hover:bg-sky-600 group-hover:text-white transition-colors">
-                <Stethoscope className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 group-hover:text-sky-800">
-                  Đội Ngũ Bác Sĩ
+              {/* Doctor Shortcut 6: Đội ngũ Bác sĩ */}
+              <Link
+                to="/doctors"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:bg-sky-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-sky-100 text-sky-700 group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                    <UserCheck className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-sky-800">
+                      Đội Ngũ Bác Sĩ
+                    </div>
+                    <div className="text-[11px] text-slate-500">Danh bạ chuyên khoa & Bác sĩ</div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-slate-500">Danh sách chuyên khoa & Bác sĩ</div>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+            </>
+          ) : currentRole === 'ADMIN' ? (
+            /* ========================================================================= */
+            /* ROLE ADMIN SHORTCUTS: 100% Nghiệp vụ quản trị hệ thống                    */
+            /* ========================================================================= */
+            <>
+              {/* Admin Shortcut 1: Cài đặt hệ thống */}
+              <Link
+                to="/admin/settings"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-teal-100 text-teal-700 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                    <Settings className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-teal-800">
+                      Cài Đặt Hệ Thống
+                    </div>
+                    <div className="text-[11px] text-slate-500">Bảo mật & Quản lý tài khoản</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+
+              {/* Admin Shortcut 2: Danh Mục Dùng Chung */}
+              <Link
+                to="/admin/master-data"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <Layers className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
+                      Danh Mục Dùng Chung
+                    </div>
+                    <div className="text-[11px] text-slate-500">Chuyên khoa, Phòng, Giá dịch vụ</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+
+              {/* Admin Shortcut 3: Quản Lý Nhân Sự */}
+              <Link
+                to="/admin/staff"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                    <UserCheck className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-purple-800">
+                      Quản Lý Nhân Sự
+                    </div>
+                    <div className="text-[11px] text-slate-500">Hồ sơ & Phân quyền đa vai trò</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+
+              {/* Admin Shortcut 4: Nhật Ký Kiểm Toán */}
+              <Link
+                to="/admin/audit-logs"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-rose-100 text-rose-700 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                    <ShieldAlert className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-rose-800">
+                      Nhật Ký Kiểm Toán
+                    </div>
+                    <div className="text-[11px] text-slate-500">Giám sát an toàn & Audit log</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-rose-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+
+              {/* Admin Shortcut 5: Báo Cáo Quản Trị */}
+              <Link
+                to="/admin/reports"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <BarChart3 className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-indigo-800">
+                      Báo Cáo Quản Trị
+                    </div>
+                    <div className="text-[11px] text-slate-500">Thống kê ca khám & Xuất CSV</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+
+              {/* Admin Shortcut 6: Đội ngũ Bác sĩ */}
+              <Link
+                to="/doctors"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:bg-sky-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-sky-100 text-sky-700 group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                    <Stethoscope className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-sky-800">
+                      Đội Ngũ Bác Sĩ
+                    </div>
+                    <div className="text-[11px] text-slate-500">Danh sách chuyên khoa & Bác sĩ</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+            </>
+          ) : (
+            /* ========================================================================= */
+            /* OTHER ROLES (CASHIER, RECEPTIONIST, GUEST)                                */
+            /* ========================================================================= */
+            <>
+              <Link
+                to="/billing"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <BarChart3 className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
+                      Thu Ngân & Viện Phí
+                    </div>
+                    <div className="text-[11px] text-slate-500">Quản lý hóa đơn và thanh toán</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+
+              <Link
+                to="/doctors"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:bg-sky-50/40 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-sky-100 text-sky-700 group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                    <Stethoscope className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-sky-800">
+                      Đội Ngũ Bác Sĩ
+                    </div>
+                    <div className="text-[11px] text-slate-500">Danh bạ chuyên khoa & Bác sĩ</div>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all" />
+              </Link>
+            </>
+          )}
         </div>
       </div>
-
-      {/* Role Switcher Modal */}
-      <RoleSwitcherModal
-        isOpen={showRoleModal}
-        onClose={() => setShowRoleModal(false)}
-        onSuccess={() => refetch()}
-      />
     </div>
   );
 };
