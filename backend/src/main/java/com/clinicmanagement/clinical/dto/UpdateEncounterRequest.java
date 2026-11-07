@@ -15,8 +15,16 @@ public class UpdateEncounterRequest {
     @Size(max = 1000, message = "Chẩn đoán tối đa 1000 ký tự")
     private String diagnosis;
 
+    @Size(max = 30, message = "Mã ICD-10 tối đa 30 ký tự")
+    private String icd10Code;
+
+    private String secondaryDiagnoses;
+
     @Size(max = 4000, message = "Hướng xử trí tối đa 4000 ký tự")
     private String treatmentPlan;
+
+    private java.time.LocalDate followUpDate;
+    private String followUpNotes;
 
     private BigDecimal temperature;
     private String bloodPressure;
@@ -106,6 +114,38 @@ public class UpdateEncounterRequest {
 
     public void setHeight(BigDecimal height) {
         this.height = height;
+    }
+
+    public String getIcd10Code() {
+        return icd10Code;
+    }
+
+    public void setIcd10Code(String icd10Code) {
+        this.icd10Code = icd10Code;
+    }
+
+    public String getSecondaryDiagnoses() {
+        return secondaryDiagnoses;
+    }
+
+    public void setSecondaryDiagnoses(String secondaryDiagnoses) {
+        this.secondaryDiagnoses = secondaryDiagnoses;
+    }
+
+    public java.time.LocalDate getFollowUpDate() {
+        return followUpDate;
+    }
+
+    public void setFollowUpDate(java.time.LocalDate followUpDate) {
+        this.followUpDate = followUpDate;
+    }
+
+    public String getFollowUpNotes() {
+        return followUpNotes;
+    }
+
+    public void setFollowUpNotes(String followUpNotes) {
+        this.followUpNotes = followUpNotes;
     }
 }
 

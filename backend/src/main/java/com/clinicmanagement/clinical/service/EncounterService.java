@@ -285,6 +285,18 @@ public class EncounterService {
         if (request.getHeight() != null) {
             encounter.setHeight(request.getHeight());
         }
+        if (request.getIcd10Code() != null) {
+            encounter.setIcd10Code(request.getIcd10Code());
+        }
+        if (request.getSecondaryDiagnoses() != null) {
+            encounter.setSecondaryDiagnoses(request.getSecondaryDiagnoses());
+        }
+        if (request.getFollowUpDate() != null) {
+            encounter.setFollowUpDate(request.getFollowUpDate());
+        }
+        if (request.getFollowUpNotes() != null) {
+            encounter.setFollowUpNotes(request.getFollowUpNotes());
+        }
 
         Encounter updated = encounterRepository.save(encounter);
 
@@ -443,7 +455,11 @@ public class EncounterService {
         res.setChiefComplaint(encounter.getChiefComplaint());
         res.setExaminationNotes(encounter.getExaminationNotes());
         res.setDiagnosis(encounter.getDiagnosis());
+        res.setIcd10Code(encounter.getIcd10Code());
+        res.setSecondaryDiagnoses(encounter.getSecondaryDiagnoses());
         res.setTreatmentPlan(encounter.getTreatmentPlan());
+        res.setFollowUpDate(encounter.getFollowUpDate());
+        res.setFollowUpNotes(encounter.getFollowUpNotes());
         res.setStatus(encounter.getStatus());
         res.setTemperature(encounter.getTemperature());
         res.setBloodPressure(encounter.getBloodPressure());

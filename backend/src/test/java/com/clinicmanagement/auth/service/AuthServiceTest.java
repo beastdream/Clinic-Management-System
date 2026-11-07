@@ -49,13 +49,19 @@ class AuthServiceTest {
     @Mock AuditLogRepository auditLogRepository;
     @Mock EmailVerificationService emailVerificationService;
     @Mock GoogleTokenVerifier googleTokenVerifier;
+    @Mock com.clinicmanagement.admin.service.SystemSettingService systemSettingService;
 
     AuthService authService;
 
     @BeforeEach
     void setUp() {
+        lenient().when(systemSettingService.isAllowPatientRegistration()).thenReturn(true);
+        lenient().when(systemSettingService.getMaxFailedLoginAttempts()).thenReturn(5);
+        lenient().when(systemSettingService.getLockoutDurationMinutes()).thenReturn(15);
+        lenient().when(systemSettingService.getPasswordMinLength()).thenReturn(8);
+        lenient().when(systemSettingService.isMaintenanceMode()).thenReturn(false);
         authService = new AuthService(userRepository, roleRepository, passwordEncoder, tokenProvider,
-                userDetailsService, patientService, auditLogRepository, emailVerificationService, googleTokenVerifier);
+                userDetailsService, patientService, auditLogRepository, emailVerificationService, googleTokenVerifier, systemSettingService);
     }
 
     private RegisterRequest validRequest() {
