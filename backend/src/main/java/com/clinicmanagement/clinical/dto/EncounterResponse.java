@@ -28,7 +28,11 @@ public class EncounterResponse {
     private String chiefComplaint;
     private String examinationNotes;
     private String diagnosis;
+    private String icd10Code;
+    private String secondaryDiagnoses;
     private String treatmentPlan;
+    private java.time.LocalDate followUpDate;
+    private String followUpNotes;
     private String status;
     private BigDecimal temperature;
     private String bloodPressure;
@@ -305,6 +309,38 @@ public class EncounterResponse {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getIcd10Code() {
+        return icd10Code;
+    }
+
+    public void setIcd10Code(String icd10Code) {
+        this.icd10Code = icd10Code;
+    }
+
+    public String getSecondaryDiagnoses() {
+        return secondaryDiagnoses;
+    }
+
+    public void setSecondaryDiagnoses(String secondaryDiagnoses) {
+        this.secondaryDiagnoses = secondaryDiagnoses;
+    }
+
+    public java.time.LocalDate getFollowUpDate() {
+        return followUpDate;
+    }
+
+    public void setFollowUpDate(java.time.LocalDate followUpDate) {
+        this.followUpDate = followUpDate;
+    }
+
+    public String getFollowUpNotes() {
+        return followUpNotes;
+    }
+
+    public void setFollowUpNotes(String followUpNotes) {
+        this.followUpNotes = followUpNotes;
     }
 }
 

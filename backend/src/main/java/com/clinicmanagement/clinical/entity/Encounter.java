@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -40,8 +41,20 @@ public class Encounter extends BaseEntity {
     @Column(name = "diagnosis", columnDefinition = "TEXT", nullable = false)
     private String diagnosis;
 
+    @Column(name = "icd10_code", length = 30)
+    private String icd10Code;
+
+    @Column(name = "secondary_diagnoses", columnDefinition = "TEXT")
+    private String secondaryDiagnoses;
+
     @Column(name = "treatment_plan", columnDefinition = "TEXT")
     private String treatmentPlan;
+
+    @Column(name = "follow_up_date")
+    private LocalDate followUpDate;
+
+    @Column(name = "follow_up_notes", columnDefinition = "TEXT")
+    private String followUpNotes;
 
     @Column(name = "status", length = 20, nullable = false)
     private String status = "IN_PROGRESS"; // IN_PROGRESS, COMPLETED, CANCELLED
@@ -224,6 +237,38 @@ public class Encounter extends BaseEntity {
 
     public void setDeletedAt(Instant deletedAt) {
         this.deletedAt = deletedAt;
+    }
+
+    public String getIcd10Code() {
+        return icd10Code;
+    }
+
+    public void setIcd10Code(String icd10Code) {
+        this.icd10Code = icd10Code;
+    }
+
+    public String getSecondaryDiagnoses() {
+        return secondaryDiagnoses;
+    }
+
+    public void setSecondaryDiagnoses(String secondaryDiagnoses) {
+        this.secondaryDiagnoses = secondaryDiagnoses;
+    }
+
+    public LocalDate getFollowUpDate() {
+        return followUpDate;
+    }
+
+    public void setFollowUpDate(LocalDate followUpDate) {
+        this.followUpDate = followUpDate;
+    }
+
+    public String getFollowUpNotes() {
+        return followUpNotes;
+    }
+
+    public void setFollowUpNotes(String followUpNotes) {
+        this.followUpNotes = followUpNotes;
     }
 }
 

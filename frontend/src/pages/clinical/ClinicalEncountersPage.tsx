@@ -21,7 +21,10 @@ import {
   ArrowRight,
   FileText,
   AlertTriangle,
-  Check
+  Check,
+  TrendingUp,
+  Calendar,
+  CalendarClock
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -29,8 +32,13 @@ import { Badge } from '@/components/ui/Badge';
 import { Alert } from '@/components/ui/Alert';
 import { LoadingCard } from '@/components/ui/LoadingSkeleton';
 import { clinicalService } from '@/services/clinicalService';
-import { Encounter } from '@/types/clinical';
+import { Encounter, Prescription, ServiceOrder } from '@/types/clinical';
 import { formatDateTime, formatDate } from '@/lib/utils';
+import { Icd10Selector } from './components/Icd10Selector';
+import { PrescriptionWorkbench } from './components/PrescriptionWorkbench';
+import { ServiceOrderWorkbench } from './components/ServiceOrderWorkbench';
+import { PatientEmrTimelineModal } from './components/PatientEmrTimelineModal';
+import { PrintPrescriptionModal, PrintServiceOrdersModal } from './components/PrintMedicalTemplates';
 
 export const ClinicalEncountersPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -44,12 +52,22 @@ export const ClinicalEncountersPage: React.FC = () => {
   const [examinationNotes, setExaminationNotes] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
   const [treatmentPlan, setTreatmentPlan] = useState('');
+  const [icd10Code, setIcd10Code] = useState('');
+  const [secondaryDiagnoses, setSecondaryDiagnoses] = useState('');
+  const [followUpDate, setFollowUpDate] = useState('');
+  const [followUpNotes, setFollowUpNotes] = useState('');
+
   const [temperature, setTemperature] = useState<string>('');
   const [bloodPressure, setBloodPressure] = useState<string>('');
   const [heartRate, setHeartRate] = useState<string>('');
   const [respiratoryRate, setRespiratoryRate] = useState<string>('');
   const [weight, setWeight] = useState<string>('');
   const [height, setHeight] = useState<string>('');
+
+  // Modals for 6 clinical pillars
+  const [isOpenEmrModal, setIsOpenEmrModal] = useState(false);
+  const [printingPrescription, setPrintingPrescription] = useState<Prescription | null>(null);
+  const [printingOrders, setPrintingOrders] = useState<ServiceOrder[] | null>(null);
 
   // History search state
   const [historySearch, setHistorySearch] = useState('');
@@ -96,6 +114,10 @@ export const ClinicalEncountersPage: React.FC = () => {
       setExaminationNotes(selectedEncounter.examinationNotes || '');
       setDiagnosis(selectedEncounter.diagnosis || '');
       setTreatmentPlan(selectedEncounter.treatmentPlan || '');
+      setIcd10Code(selectedEncounter.icd10Code || '');
+      setSecondaryDiagnoses(selectedEncounter.secondaryDiagnoses || '');
+      setFollowUpDate(selectedEncounter.followUpDate || '');
+      setFollowUpNotes(selectedEncounter.followUpNotes || '');
       setTemperature(selectedEncounter.temperature != null ? String(selectedEncounter.temperature) : '');
       setBloodPressure(selectedEncounter.bloodPressure || '');
       setHeartRate(selectedEncounter.heartRate != null ? String(selectedEncounter.heartRate) : '');
@@ -189,8 +211,17 @@ export const ClinicalEncountersPage: React.FC = () => {
     startEncounterMutation.mutate(appointmentId);
   };
 
-  const handleSaveDraft = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSetFollowUpDays = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    setFollowUpDate(`${yyyy}-${mm}-${dd}`);
+  };
+
+  const handleSaveDraft = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!selectedEncounter) return;
 
     updateEncounterMutation.mutate({
@@ -200,6 +231,10 @@ export const ClinicalEncountersPage: React.FC = () => {
         examinationNotes,
         diagnosis,
         treatmentPlan,
+        icd10Code: icd10Code || undefined,
+        secondaryDiagnoses: secondaryDiagnoses || undefined,
+        followUpDate: followUpDate || undefined,
+        followUpNotes: followUpNotes || undefined,
         temperature: temperature ? parseFloat(temperature) : undefined,
         bloodPressure: bloodPressure || undefined,
         heartRate: heartRate ? parseInt(heartRate) : undefined,
@@ -228,6 +263,10 @@ export const ClinicalEncountersPage: React.FC = () => {
           examinationNotes,
           diagnosis,
           treatmentPlan,
+          icd10Code: icd10Code || undefined,
+          secondaryDiagnoses: secondaryDiagnoses || undefined,
+          followUpDate: followUpDate || undefined,
+          followUpNotes: followUpNotes || undefined,
           temperature: temperature ? parseFloat(temperature) : undefined,
           bloodPressure: bloodPressure || undefined,
           heartRate: heartRate ? parseInt(heartRate) : undefined,
@@ -562,6 +601,18 @@ export const ClinicalEncountersPage: React.FC = () => {
                       type="button"
                       variant="outline"
                       size="sm"
+                      onClick={() => setIsOpenEmrModal(true)}
+                      className="text-xs h-8 gap-1.5 border-teal-300 text-teal-800 hover:bg-teal-50"
+                      title="Xem biểu đồ diễn tiến sinh hiệu và bệnh sử qua các lần khám"
+                    >
+                      <TrendingUp className="h-3.5 w-3.5 text-teal-600" />
+                      Bệnh án dọc & Sinh hiệu (EMR)
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
                       onClick={() => {
                         setHistoryPatientFilter(selectedEncounter.patientId);
                         setActiveTab('history');
@@ -745,43 +796,158 @@ export const ClinicalEncountersPage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* SECTION 4: DIAGNOSIS (CHẨN ĐOÁN) */}
+              {/* SECTION 4: DIAGNOSIS & ICD-10 (CHẨN ĐOÁN & MÃ BỆNH ICD-10) */}
               <Card className="border-teal-200">
                 <CardHeader className="pb-2 border-b border-teal-100 bg-teal-50/40">
-                  <CardTitle className="text-sm font-bold text-teal-900 flex items-center gap-1.5">
-                    <Stethoscope className="h-4 w-4 text-teal-700" />
-                    4. Chẩn đoán y khoa của Bác sĩ <span className="text-rose-500">*</span>
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-bold text-teal-900 flex items-center gap-1.5">
+                      <Stethoscope className="h-4 w-4 text-teal-700" />
+                      4. Chẩn đoán y khoa & Chuẩn hóa mã bệnh ICD-10 <span className="text-rose-500">*</span>
+                    </CardTitle>
+                    {icd10Code && (
+                      <Badge className="bg-teal-700 text-white font-mono text-xs">
+                        ICD-10: {icd10Code}
+                      </Badge>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="p-4">
-                  <textarea
-                    rows={2}
-                    placeholder="Nhập chẩn đoán xác định, chẩn đoán phân biệt hoặc mã bệnh ICD-10 (ví dụ: Tăng huyết áp vô căn I10, Viêm phế quản cấp J20)..."
-                    value={diagnosis}
-                    onChange={(e) => setDiagnosis(e.target.value)}
+                  <Icd10Selector
+                    currentIcd10={icd10Code}
+                    currentDiagnosis={diagnosis}
+                    currentSecondary={secondaryDiagnoses}
+                    onSelectPrimary={(code, nameVi) => {
+                      setIcd10Code(code);
+                      setDiagnosis(`${code} - ${nameVi}`);
+                    }}
+                    onChangeDiagnosis={(text) => setDiagnosis(text)}
+                    onChangeSecondary={(text) => setSecondaryDiagnoses(text)}
                     disabled={isFormLocked}
-                    required
-                    className="w-full text-sm font-semibold rounded-lg border border-slate-200 p-3 focus:border-teal-500 focus:outline-none disabled:bg-slate-50"
                   />
                 </CardContent>
               </Card>
 
-              {/* SECTION 5: TREATMENT PLAN */}
+              {/* SECTION 5: SERVICE ORDERS (CHỈ ĐỊNH CẬN LÂM SÀNG & ĐẨY VIỆN PHÍ) */}
+              <ServiceOrderWorkbench
+                encounterId={selectedEncounter.id}
+                patientId={selectedEncounter.patientId}
+                isLocked={isFormLocked}
+                onPrintOrders={(orders) => setPrintingOrders(orders)}
+              />
+
+              {/* SECTION 6: E-PRESCRIPTION (KÊ ĐƠN THUỐC ĐIỆN TỬ & DƯỢC) */}
+              <PrescriptionWorkbench
+                encounterId={selectedEncounter.id}
+                patientId={selectedEncounter.patientId}
+                patientName={selectedEncounter.patientName || ''}
+                patientAllergies={selectedEncounter.patientAllergies}
+                diagnosis={diagnosis}
+                isLocked={isFormLocked}
+                onPrintPrescription={(p) => setPrintingPrescription(p)}
+              />
+
+              {/* SECTION 7: TREATMENT PLAN, FOLLOW-UP & ADVICE */}
               <Card>
                 <CardHeader className="pb-2 border-b border-slate-100">
-                  <CardTitle className="text-sm font-bold text-slate-800">
-                    5. Hướng xử trí, lời dặn điều trị & Hẹn tái khám
+                  <CardTitle className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <CalendarClock className="h-4 w-4 text-teal-600" />
+                    7. Hướng xử trí, Lời dặn điều trị & Hẹn tái khám
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-4">
-                  <textarea
-                    rows={4}
-                    placeholder="Kế hoạch điều trị, đơn thuốc ngoại trú, chế độ dinh dưỡng vận động, dấu hiệu nguy hiểm cần nhập viện, thời gian hẹn tái khám..."
-                    value={treatmentPlan}
-                    onChange={(e) => setTreatmentPlan(e.target.value)}
-                    disabled={isFormLocked}
-                    className="w-full text-sm rounded-lg border border-slate-200 p-3 focus:border-teal-500 focus:outline-none disabled:bg-slate-50"
-                  />
+                <CardContent className="p-4 space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      Kế hoạch điều trị & Lời dặn dò bác sĩ
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder="Kế hoạch điều trị ngoại trú, chế độ dinh dưỡng, vận động, dặn dò uống thuốc theo toa..."
+                      value={treatmentPlan}
+                      onChange={(e) => setTreatmentPlan(e.target.value)}
+                      disabled={isFormLocked}
+                      className="w-full text-sm rounded-lg border border-slate-200 p-3 focus:border-teal-500 focus:outline-none disabled:bg-slate-50"
+                    />
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-teal-100 bg-teal-50/30 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-teal-900">
+                        <Calendar className="h-4 w-4 text-teal-700" />
+                        Lịch hẹn tái khám
+                      </div>
+
+                      {!isFormLocked && (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[11px] text-slate-500">Chọn nhanh:</span>
+                          <button
+                            type="button"
+                            onClick={() => handleSetFollowUpDays(3)}
+                            className="text-[11px] px-2 py-0.5 rounded bg-white border border-teal-200 hover:bg-teal-50 text-teal-700 font-medium"
+                          >
+                            +3 ngày
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSetFollowUpDays(7)}
+                            className="text-[11px] px-2 py-0.5 rounded bg-white border border-teal-200 hover:bg-teal-50 text-teal-700 font-medium"
+                          >
+                            +7 ngày
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSetFollowUpDays(14)}
+                            className="text-[11px] px-2 py-0.5 rounded bg-white border border-teal-200 hover:bg-teal-50 text-teal-700 font-medium"
+                          >
+                            +14 ngày
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSetFollowUpDays(30)}
+                            className="text-[11px] px-2 py-0.5 rounded bg-white border border-teal-200 hover:bg-teal-50 text-teal-700 font-medium"
+                          >
+                            +1 tháng
+                          </button>
+                          {followUpDate && (
+                            <button
+                              type="button"
+                              onClick={() => setFollowUpDate('')}
+                              className="text-[11px] px-2 py-0.5 rounded bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 font-medium"
+                            >
+                              Xóa hẹn
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">
+                          Ngày hẹn tái khám
+                        </label>
+                        <input
+                          type="date"
+                          value={followUpDate}
+                          onChange={(e) => setFollowUpDate(e.target.value)}
+                          disabled={isFormLocked}
+                          className="w-full text-xs font-semibold rounded-lg border border-slate-200 px-3 py-2 bg-white focus:outline-none focus:border-teal-500 disabled:bg-slate-100"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-medium text-slate-600 mb-1">
+                          Ghi chú & Dấu hiệu bất thường cần tái khám ngay
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ví dụ: Tái khám nếu sốt cao liên tục >38.5°C, khó thở tăng dần hoặc phát ban..."
+                          value={followUpNotes}
+                          onChange={(e) => setFollowUpNotes(e.target.value)}
+                          disabled={isFormLocked}
+                          className="w-full text-xs rounded-lg border border-slate-200 px-3 py-2 bg-white focus:outline-none focus:border-teal-500 disabled:bg-slate-100"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -1064,14 +1230,41 @@ export const ClinicalEncountersPage: React.FC = () => {
                   )}
 
                   <div>
-                    <strong className="block text-teal-800 mb-0.5">Chẩn đoán y khoa:</strong>
-                    <p className="bg-teal-50/60 p-2.5 rounded border border-teal-100 font-semibold text-slate-900 whitespace-pre-line">{viewDetailModal.diagnosis}</p>
+                    <strong className="block text-teal-800 mb-0.5">Chẩn đoán y khoa & ICD-10:</strong>
+                    <div className="bg-teal-50/60 p-2.5 rounded border border-teal-100 space-y-1">
+                      <div className="font-semibold text-slate-900 whitespace-pre-line">{viewDetailModal.diagnosis}</div>
+                      {viewDetailModal.icd10Code && (
+                        <div className="text-[11px] font-mono text-teal-800 flex items-center gap-1.5 mt-1">
+                          <span>Mã ICD-10:</span>
+                          <span className="bg-teal-700 text-white font-mono text-[10px] px-1.5 py-0.5 rounded font-bold">
+                            {viewDetailModal.icd10Code}
+                          </span>
+                        </div>
+                      )}
+                      {viewDetailModal.secondaryDiagnoses && (
+                        <div className="text-[11px] text-slate-600 mt-1">
+                          Bệnh kèm theo: <em>{viewDetailModal.secondaryDiagnoses}</em>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {viewDetailModal.treatmentPlan && (
                     <div>
                       <strong className="block text-slate-800 mb-0.5">Hướng xử trí & Lời dặn:</strong>
                       <p className="bg-slate-50 p-2.5 rounded border border-slate-100 whitespace-pre-line">{viewDetailModal.treatmentPlan}</p>
+                    </div>
+                  )}
+
+                  {(viewDetailModal.followUpDate || viewDetailModal.followUpNotes) && (
+                    <div className="bg-amber-50/60 p-2.5 rounded border border-amber-200 text-amber-900">
+                      <strong className="block mb-1 text-xs">Lịch hẹn tái khám:</strong>
+                      {viewDetailModal.followUpDate && (
+                        <div>Ngày hẹn: <strong className="font-mono">{formatDate(viewDetailModal.followUpDate)}</strong></div>
+                      )}
+                      {viewDetailModal.followUpNotes && (
+                        <div className="text-[11px] text-amber-800 italic mt-0.5">Lời dặn: {viewDetailModal.followUpNotes}</div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1114,6 +1307,31 @@ export const ClinicalEncountersPage: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Modals for 6 Clinical Pillars */}
+      {isOpenEmrModal && selectedEncounter && (
+        <PatientEmrTimelineModal
+          patientId={selectedEncounter.patientId}
+          onClose={() => setIsOpenEmrModal(false)}
+        />
+      )}
+
+      {printingPrescription && (
+        <PrintPrescriptionModal
+          prescription={printingPrescription}
+          onClose={() => setPrintingPrescription(null)}
+        />
+      )}
+
+      {printingOrders && selectedEncounter && (
+        <PrintServiceOrdersModal
+          orders={printingOrders}
+          patientName={selectedEncounter.patientName || ''}
+          patientCode={selectedEncounter.patientCode || ''}
+          doctorName={selectedEncounter.doctorName || ''}
+          onClose={() => setPrintingOrders(null)}
+        />
       )}
     </div>
   );
