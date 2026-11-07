@@ -48,6 +48,10 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     navigate('/login', { replace: true });
   };
 
+  const isAdmin = currentUser?.roles?.some(
+    (r) => r.toUpperCase() === 'ROLE_ADMIN' || r.toUpperCase() === 'ADMIN'
+  );
+
   return (
     <>
       <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/95 px-4 sm:px-6 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -77,16 +81,18 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          {/* Quick Demo Role Switcher Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowRoleModal(true)}
-            className="h-8 gap-1.5 border-teal-200 bg-teal-50/50 text-teal-800 hover:bg-teal-100 text-xs font-semibold shadow-xs"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-teal-600" />
-            <span className="hidden sm:inline">Đổi Vai Trò</span> (Demo RBAC)
-          </Button>
+          {/* Quick Demo Role Switcher Button - Hidden for ADMIN */}
+          {!isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowRoleModal(true)}
+              className="h-8 gap-1.5 border-teal-200 bg-teal-50/50 text-teal-800 hover:bg-teal-100 text-xs font-semibold shadow-xs"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-teal-600" />
+              <span className="hidden sm:inline">Đổi Vai Trò</span> (Demo RBAC)
+            </Button>
+          )}
 
           {/* System status pill */}
           <Badge variant="success" className="gap-1.5 py-1 px-2.5 hidden md:inline-flex">
