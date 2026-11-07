@@ -38,6 +38,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.clinicmanagement.admin.service.SystemSettingService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -58,6 +59,7 @@ public class AuthService {
     private final AuditLogRepository auditLogRepository;
     private final EmailVerificationService emailVerificationService;
     private final GoogleTokenVerifier googleTokenVerifier;
+    private final SystemSettingService systemSettingService;
 
     @Value("${app.jwt.expiration-ms:900000}")
     private long jwtExpirationMs;
@@ -65,7 +67,8 @@ public class AuthService {
     public AuthService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder,
                        JwtTokenProvider tokenProvider, CustomUserDetailsService userDetailsService,
                        PatientService patientService, AuditLogRepository auditLogRepository,
-                       EmailVerificationService emailVerificationService, GoogleTokenVerifier googleTokenVerifier) {
+                       EmailVerificationService emailVerificationService, GoogleTokenVerifier googleTokenVerifier,
+                       SystemSettingService systemSettingService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -75,6 +78,7 @@ public class AuthService {
         this.auditLogRepository = auditLogRepository;
         this.emailVerificationService = emailVerificationService;
         this.googleTokenVerifier = googleTokenVerifier;
+        this.systemSettingService = systemSettingService;
     }
 
     /**
@@ -85,6 +89,15 @@ public class AuthService {
      */
     @Transactional
     public RegistrationResult register(RegisterRequest request) {
+        if (!systemSettingService.isAllowPatientRegistration()) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "Cổng đăng ký trực tuyến tạm thời đóng. Vui lòng liên hệ trực tiếp quầy tiếp tân");
+        }
+
+        int minLen = systemSettingService.getPasswordMinLength();
+        if (request.password() != null && request.password().length() < minLen) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST, "Mật khẩu phải có độ dài tối thiểu " + minLen + " ký tự");
+        }
+
         String username = request.username().trim();
         String email = request.email().trim().toLowerCase();
 
@@ -238,11 +251,21 @@ public class AuthService {
     }
 
     private void ensureCanLogin(User user) {
+        if (systemSettingService.isMaintenanceMode()) {
+            boolean isAdmin = user.getRoles() != null && user.getRoles().stream()
+                    .anyMatch(r -> "ROLE_ADMIN".equalsIgnoreCase(r.getCode()) || "ADMIN".equalsIgnoreCase(r.getCode()));
+            if (!isAdmin) {
+                log.warn("Đăng nhập bị từ chối cho [{}] do hệ thống đang bật chế độ bảo trì", user.getUsername());
+                throw new BusinessException(ErrorCode.SYSTEM_MAINTENANCE_MODE, systemSettingService.getMaintenanceMessage());
+            }
+        }
         if ("LOCKED".equalsIgnoreCase(user.getStatus())) {
             if (user.getLockedUntil() != null && Instant.now().isBefore(user.getLockedUntil())) {
                 throw new BusinessException(ErrorCode.ACCOUNT_LOCKED);
             }
             user.setStatus("ACTIVE");
+            user.setFailedLoginAttempts(0);
+            user.setLockedUntil(null);
         }
         if (!user.isAccountActive()) {
             throw new BusinessException(ErrorCode.ACCOUNT_SUSPENDED);
@@ -270,22 +293,8 @@ public class AuthService {
                     return new BusinessException(ErrorCode.INVALID_CREDENTIALS);
                 });
 
-        // Kiểm tra khóa tài khoản
-        if ("LOCKED".equalsIgnoreCase(user.getStatus())) {
-            if (user.getLockedUntil() != null && Instant.now().isBefore(user.getLockedUntil())) {
-                log.warn("Tài khoản [{}] đang bị khóa đến [{}]", user.getUsername(), user.getLockedUntil());
-                throw new BusinessException(ErrorCode.ACCOUNT_LOCKED);
-            } else {
-                // Hết thời gian khóa -> mở lại
-                user.setStatus("ACTIVE");
-                user.setFailedLoginAttempts(0);
-                user.setLockedUntil(null);
-            }
-        }
-
-        if (!user.isAccountActive()) {
-            throw new BusinessException(ErrorCode.ACCOUNT_SUSPENDED);
-        }
+        // Kiểm tra bảo trì và trạng thái khóa/ngưng hoạt động
+        ensureCanLogin(user);
 
         if (user.getPasswordHash() == null) {
             throw new BusinessException(ErrorCode.PASSWORD_LOGIN_NOT_AVAILABLE);
@@ -296,20 +305,25 @@ public class AuthService {
             int attempts = user.getFailedLoginAttempts() + 1;
             user.setFailedLoginAttempts(attempts);
 
-            if (attempts >= 5) {
+            int maxAttempts = systemSettingService.getMaxFailedLoginAttempts();
+            int lockoutMinutes = systemSettingService.getLockoutDurationMinutes();
+
+            if (attempts >= maxAttempts) {
                 user.setStatus("LOCKED");
-                user.setLockedUntil(Instant.now().plus(15, ChronoUnit.MINUTES));
+                user.setLockedUntil(Instant.now().plus(lockoutMinutes, ChronoUnit.MINUTES));
                 userRepository.save(user);
                 recordAudit(user.getId(), user.getUsername(), rolesOf(user), "ACCOUNT_LOCKED", "users", user.getId(),
-                        "{\"failedAttempts\":" + attempts + "}");
-                log.warn("Tài khoản [{}] bị khóa 15 phút do nhập sai mật khẩu 5 lần", user.getUsername());
-                throw new BusinessException(ErrorCode.ACCOUNT_LOCKED);
+                        "{\"failedAttempts\":" + attempts + ",\"lockoutMinutes\":" + lockoutMinutes + "}");
+                log.warn("Tài khoản [{}] bị khóa {} phút do nhập sai mật khẩu {} lần", user.getUsername(), lockoutMinutes, attempts);
+                throw new BusinessException(ErrorCode.ACCOUNT_LOCKED,
+                        String.format("Tài khoản đã bị tạm khóa %d phút do nhập sai mật khẩu %d/%d lần", lockoutMinutes, attempts, maxAttempts));
             }
 
             userRepository.save(user);
             recordAudit(user.getId(), user.getUsername(), rolesOf(user), "LOGIN_FAILED", "users", user.getId(),
                     "{\"failedAttempts\":" + attempts + "}");
-            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
+            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS,
+                    String.format("Tên đăng nhập hoặc mật khẩu không chính xác (Đã nhập sai %d/%d lần)", attempts, maxAttempts));
         }
 
         // Mật khẩu đúng nhưng bệnh nhân chưa xác thực email -> chưa cho đăng nhập (nhân viên do Admin cấp, không áp dụng)

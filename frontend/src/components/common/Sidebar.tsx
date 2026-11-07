@@ -3,12 +3,14 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard,
   Users, 
-  Calendar, 
   Stethoscope, 
-  CreditCard, 
   UserCheck,
+  Settings,
+  X,
   Layers,
-  X
+  UserCog,
+  ShieldAlert,
+  BarChart3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { authService } from '@/services/authService';
@@ -38,25 +40,6 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    groupTitle: 'Tiếp Đón & Bệnh Nhân',
-    items: [
-      { 
-        name: 'Hồ sơ Bệnh nhân', 
-        href: '/patients', 
-        icon: Users, 
-        badge: 'Core',
-        allowedRoles: ['ROLE_RECEPTIONIST', 'ROLE_ADMIN', 'ROLE_DOCTOR', 'ROLE_CASHIER'],
-      },
-      { 
-        name: 'Lịch hẹn & Tiếp đón', 
-        href: '/appointments', 
-        icon: Calendar, 
-        badge: 'Core',
-        allowedRoles: ['ROLE_RECEPTIONIST', 'ROLE_ADMIN', 'ROLE_DOCTOR'],
-      },
-    ],
-  },
-  {
     groupTitle: 'Khám & Điều Trị',
     items: [
       { 
@@ -64,7 +47,13 @@ const navGroups: NavGroup[] = [
         href: '/clinical', 
         icon: Stethoscope, 
         badge: 'Bác sĩ',
-        // Clinical privacy: ADMIN does NOT have access to clinical records
+        allowedRoles: ['ROLE_DOCTOR'],
+      },
+      { 
+        name: 'Hồ sơ Bệnh nhân', 
+        href: '/patients', 
+        icon: Users, 
+        badge: 'Bác sĩ',
         allowedRoles: ['ROLE_DOCTOR'],
       },
       { 
@@ -76,14 +65,42 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    groupTitle: 'Tài Chính & Viện Phí',
+    groupTitle: 'Hệ Thống & Cài Đặt',
     items: [
       { 
-        name: 'Thu ngân & Viện phí', 
-        href: '/billing', 
-        icon: CreditCard, 
-        badge: 'Core',
-        allowedRoles: ['ROLE_CASHIER', 'ROLE_ADMIN', 'ROLE_RECEPTIONIST'],
+        name: 'Cài Đặt Hệ Thống', 
+        href: '/admin/settings', 
+        icon: Settings, 
+        badge: 'Admin',
+        allowedRoles: ['ROLE_ADMIN'],
+      },
+      { 
+        name: 'Danh Mục Dùng Chung', 
+        href: '/admin/master-data', 
+        icon: Layers, 
+        badge: 'Admin',
+        allowedRoles: ['ROLE_ADMIN'],
+      },
+      { 
+        name: 'Quản Lý Nhân Sự', 
+        href: '/admin/staff', 
+        icon: UserCog, 
+        badge: 'Admin',
+        allowedRoles: ['ROLE_ADMIN'],
+      },
+      { 
+        name: 'Nhật Ký Kiểm Toán', 
+        href: '/admin/audit-logs', 
+        icon: ShieldAlert, 
+        badge: 'Admin',
+        allowedRoles: ['ROLE_ADMIN'],
+      },
+      { 
+        name: 'Báo Cáo Quản Trị', 
+        href: '/admin/reports', 
+        icon: BarChart3, 
+        badge: 'Admin',
+        allowedRoles: ['ROLE_ADMIN'],
       },
     ],
   },
@@ -197,24 +214,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
             </div>
           );
         })}
-      </div>
-
-      {/* Architecture Footer Box */}
-      <div className="mt-auto pt-4">
-        <div className="rounded-xl border border-teal-100 bg-gradient-to-br from-teal-50/70 to-slate-50 p-3 shadow-2xs">
-          <div className="flex items-center justify-between text-xs font-semibold text-teal-800">
-            <div className="flex items-center gap-1.5">
-              <Layers className="h-4 w-4 text-teal-600" />
-              <span>Modular Monolith</span>
-            </div>
-            <span className="text-[10px] font-mono bg-teal-100 text-teal-800 px-1.5 py-0.2 rounded font-bold">
-              v1.0
-            </span>
-          </div>
-          <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
-            Java 21 • Spring Boot 3 • React 18 • MySQL 8.4 LTS
-          </p>
-        </div>
       </div>
     </div>
   );

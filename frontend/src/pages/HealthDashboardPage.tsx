@@ -7,16 +7,18 @@ import {
   Stethoscope, 
   Clock, 
   CheckCircle2, 
-  CreditCard, 
   ArrowRight, 
   RefreshCw,
-  Database,
   Sparkles,
   AlertCircle,
   ChevronRight,
   TrendingUp,
   BarChart3,
-  CalendarCheck
+  CalendarCheck,
+  Settings,
+  UserCheck,
+  Layers,
+  ShieldAlert
 } from 'lucide-react';
 import { dashboardService } from '@/services/dashboardService';
 import { authService } from '@/services/authService';
@@ -25,7 +27,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/LoadingSkeleton';
 import { RoleSwitcherModal } from '@/components/common/RoleSwitcherModal';
-import { formatVND, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 
 export const HealthDashboardPage: React.FC = () => {
   const [showRoleModal, setShowRoleModal] = useState(false);
@@ -79,20 +81,22 @@ export const HealthDashboardPage: React.FC = () => {
               Bảng Điều Khiển Phòng Khám (Executive Dashboard)
             </h1>
             <p className="text-sm text-teal-100 max-w-2xl leading-relaxed">
-              Theo dõi trực tiếp các chỉ số y tế, tiến độ lượt khám, hàng chờ và doanh thu viện phí từ cơ sở dữ liệu MySQL thời gian thực.
+              Theo dõi trực tiếp các chỉ số y tế, tiến độ lượt khám, hàng chờ và hoạt động phòng khám từ cơ sở dữ liệu MySQL thời gian thực.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowRoleModal(true)}
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20 text-xs font-semibold gap-1.5 h-9 backdrop-blur"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-teal-300" />
-              Đổi vai trò ({currentRole})
-            </Button>
+            {currentRole !== 'ADMIN' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowRoleModal(true)}
+                className="bg-white/10 hover:bg-white/20 text-white border-white/20 text-xs font-semibold gap-1.5 h-9 backdrop-blur"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-teal-300" />
+                Đổi vai trò ({currentRole})
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -126,35 +130,56 @@ export const HealthDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* 2. 6 Core Real-time KPI Cards */}
+      {/* 2. 5 Core Real-time KPI Cards */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-28 rounded-xl" />
           ))}
         </div>
       ) : stats ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {/* KPI 1: Tổng số Bệnh nhân */}
-          <Link to="/patients" className="group">
-            <Card className="p-4 border-slate-200/80 hover:border-teal-400 hover:shadow-md transition-all h-full bg-white">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500">Tổng Bệnh Nhân</span>
-                <div className="p-2 rounded-xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors">
-                  <Users className="h-4 w-4" />
+          {currentRole === 'DOCTOR' ? (
+            <Link to="/patients" className="group">
+              <Card className="p-4 border-slate-200/80 hover:border-teal-400 hover:shadow-md transition-all h-full bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-500">Tổng Bệnh Nhân</span>
+                  <div className="p-2 rounded-xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                    <Users className="h-4 w-4" />
+                  </div>
                 </div>
-              </div>
-              <div className="mt-3">
-                <div className="text-2xl font-black text-slate-900 font-mono tracking-tight">
-                  {stats.totalPatients}
+                <div className="mt-3">
+                  <div className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+                    {stats.totalPatients}
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px] text-teal-700 font-medium mt-1">
+                    <span>Hồ sơ lưu trữ CSDL</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-[11px] text-teal-700 font-medium mt-1">
-                  <span>Hồ sơ lưu trữ CSDL</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Card>
+            </Link>
+          ) : (
+            <div className="group">
+              <Card className="p-4 border-slate-200/80 transition-all h-full bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-500">Tổng Bệnh Nhân</span>
+                  <div className="p-2 rounded-xl bg-teal-50 text-teal-600">
+                    <Users className="h-4 w-4" />
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </Link>
+                <div className="mt-3">
+                  <div className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+                    {stats.totalPatients}
+                  </div>
+                  <div className="text-[11px] text-slate-500 mt-1">
+                    <span>Hồ sơ lưu trữ CSDL</span>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
 
           {/* KPI 2: Tổng số Bác sĩ */}
           <Link to="/doctors" className="group">
@@ -178,11 +203,11 @@ export const HealthDashboardPage: React.FC = () => {
           </Link>
 
           {/* KPI 3: Lịch hẹn Hôm nay */}
-          <Link to="/appointments" className="group">
-            <Card className="p-4 border-slate-200/80 hover:border-indigo-400 hover:shadow-md transition-all h-full bg-white">
+          <div className="group">
+            <Card className="p-4 border-slate-200/80 transition-all h-full bg-white">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500">Lịch Hẹn Hôm Nay</span>
-                <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
                   <Calendar className="h-4 w-4" />
                 </div>
               </div>
@@ -190,20 +215,19 @@ export const HealthDashboardPage: React.FC = () => {
                 <div className="text-2xl font-black text-slate-900 font-mono tracking-tight">
                   {stats.todayAppointments}
                 </div>
-                <div className="flex items-center gap-1 text-[11px] text-indigo-700 font-medium mt-1">
+                <div className="text-[11px] text-slate-500 mt-1">
                   <span>Ca đăng ký trong ngày</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>
             </Card>
-          </Link>
+          </div>
 
           {/* KPI 4: Lịch hẹn đang chờ khám */}
-          <Link to="/appointments" className="group">
-            <Card className="p-4 border-slate-200/80 hover:border-amber-400 hover:shadow-md transition-all h-full bg-white">
+          <div className="group">
+            <Card className="p-4 border-slate-200/80 transition-all h-full bg-white">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500">Đang Chờ Khám</span>
-                <div className="p-2 rounded-xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                <div className="p-2 rounded-xl bg-amber-50 text-amber-600">
                   <Clock className="h-4 w-4" />
                 </div>
               </div>
@@ -211,55 +235,54 @@ export const HealthDashboardPage: React.FC = () => {
                 <div className="text-2xl font-black text-amber-600 font-mono tracking-tight">
                   {stats.waitingAppointments}
                 </div>
-                <div className="flex items-center gap-1 text-[11px] text-amber-700 font-medium mt-1">
+                <div className="text-[11px] text-slate-500 mt-1">
                   <span>Hàng chờ phòng khám</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>
             </Card>
-          </Link>
+          </div>
 
           {/* KPI 5: Số lượt khám đã hoàn thành */}
-          <Link to="/clinical" className="group">
-            <Card className="p-4 border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all h-full bg-white">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500">Đã Hoàn Thành</span>
-                <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                  <CheckCircle2 className="h-4 w-4" />
+          {currentRole === 'DOCTOR' ? (
+            <Link to="/clinical" className="group">
+              <Card className="p-4 border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all h-full bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-500">Đã Hoàn Thành</span>
+                  <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </div>
                 </div>
-              </div>
-              <div className="mt-3">
-                <div className="text-2xl font-black text-emerald-700 font-mono tracking-tight">
-                  {stats.completedEncounters}
+                <div className="mt-3">
+                  <div className="text-2xl font-black text-emerald-700 font-mono tracking-tight">
+                    {stats.completedEncounters}
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium mt-1">
+                    <span>Bệnh án đã khóa</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium mt-1">
-                  <span>Bệnh án đã khóa</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Card>
+            </Link>
+          ) : (
+            <div className="group">
+              <Card className="p-4 border-slate-200/80 transition-all h-full bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-500">Đã Hoàn Thành</span>
+                  <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </Link>
-
-          {/* KPI 6: Doanh thu viện phí đã thu */}
-          <Link to="/billing" className="group">
-            <Card className="p-4 border-slate-200/80 hover:border-emerald-500 hover:shadow-md transition-all h-full bg-white">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500">Doanh Thu Viện Phí</span>
-                <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700 group-hover:bg-emerald-700 group-hover:text-white transition-colors">
-                  <CreditCard className="h-4 w-4" />
+                <div className="mt-3">
+                  <div className="text-2xl font-black text-emerald-700 font-mono tracking-tight">
+                    {stats.completedEncounters}
+                  </div>
+                  <div className="text-[11px] text-slate-500 mt-1">
+                    <span>Bệnh án đã khóa</span>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-3">
-                <div className="text-lg font-black text-emerald-800 font-mono tracking-tight truncate" title={formatVND(stats.paidRevenue)}>
-                  {formatVND(stats.paidRevenue)}
-                </div>
-                <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium mt-1">
-                  <span>Thực thu qua MySQL</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </div>
-            </Card>
-          </Link>
+              </Card>
+            </div>
+          )}
         </div>
       ) : null}
 
@@ -395,29 +418,105 @@ export const HealthDashboardPage: React.FC = () => {
           <span className="text-[11px] text-slate-400">Chọn tác vụ thường dùng</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Action 1: Tiếp đón / Đặt lịch (Receptionist / Admin) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {/* Action 1: Cài đặt hệ thống (Admin & Quản trị) */}
           <Link
-            to="/appointments"
+            to="/admin/settings"
             className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
           >
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-teal-100 text-teal-700 group-hover:bg-teal-600 group-hover:text-white transition-colors">
-                <Calendar className="h-4 w-4" />
+                <Settings className="h-4 w-4" />
               </div>
               <div>
                 <div className="text-xs font-bold text-slate-900 group-hover:text-teal-800">
-                  Tiếp Đón & Check-in
+                  Cài Đặt Hệ Thống
                 </div>
-                <div className="text-[11px] text-slate-500">Phân luồng hàng chờ</div>
+                <div className="text-[11px] text-slate-500">Bảo mật & Quản lý tài khoản</div>
               </div>
             </div>
             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
           </Link>
 
-          {/* Action 2: Khám bệnh (Doctor) */}
+          {/* Action 2: Danh Mục Dùng Chung */}
           <Link
-            to="/clinical"
+            to="/admin/master-data"
+            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <Layers className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
+                  Danh Mục Dùng Chung
+                </div>
+                <div className="text-[11px] text-slate-500">Chuyên khoa, Phòng, Giá dịch vụ</div>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+          </Link>
+
+          {/* Action 3: Quản Lý Nhân Sự */}
+          <Link
+            to="/admin/staff"
+            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                <UserCheck className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900 group-hover:text-purple-800">
+                  Quản Lý Nhân Sự
+                </div>
+                <div className="text-[11px] text-slate-500">Hồ sơ & Phân quyền đa vai trò</div>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
+          </Link>
+
+          {/* Action 4: Nhật Ký Kiểm Toán */}
+          <Link
+            to="/admin/audit-logs"
+            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-rose-100 text-rose-700 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                <ShieldAlert className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900 group-hover:text-rose-800">
+                  Nhật Ký Kiểm Toán
+                </div>
+                <div className="text-[11px] text-slate-500">Giám sát an toàn & Audit log</div>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-rose-600 group-hover:translate-x-0.5 transition-all" />
+          </Link>
+
+          {/* Action 5: Báo Cáo Quản Trị */}
+          <Link
+            to="/admin/reports"
+            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <BarChart3 className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900 group-hover:text-indigo-800">
+                  Báo Cáo Quản Trị
+                </div>
+                <div className="text-[11px] text-slate-500">Thống kê ca khám & Xuất CSV</div>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
+          </Link>
+
+          {/* Action 6: Đội ngũ Bác sĩ */}
+          <Link
+            to="/doctors"
             className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:bg-sky-50/40 transition-all group"
           >
             <div className="flex items-center gap-3">
@@ -426,176 +525,13 @@ export const HealthDashboardPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-xs font-bold text-slate-900 group-hover:text-sky-800">
-                  Phòng Khám Lâm Sàng
+                  Đội Ngũ Bác Sĩ
                 </div>
-                <div className="text-[11px] text-slate-500">Khám & Chẩn đoán ICD-10</div>
+                <div className="text-[11px] text-slate-500">Danh sách chuyên khoa & Bác sĩ</div>
               </div>
             </div>
             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-0.5 transition-all" />
           </Link>
-
-          {/* Action 3: Thu ngân & Viện phí (Cashier) */}
-          <Link
-            to="/billing"
-            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                <CreditCard className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">
-                  Thu Ngân & Hóa Đơn
-                </div>
-                <div className="text-[11px] text-slate-500">Lập HĐ & Thu tiền viện phí</div>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
-
-          {/* Action 4: Quản lý Bệnh nhân (Tất cả) */}
-          <Link
-            to="/patients"
-            className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                <Users className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 group-hover:text-indigo-800">
-                  Hồ Sơ Bệnh Nhân
-                </div>
-                <div className="text-[11px] text-slate-500">Tìm kiếm & Đăng ký mới</div>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
-        </div>
-      </div>
-
-      {/* 5. Recent Appointments Table (5 latest from MySQL) */}
-      <Card className="border-slate-200 bg-white shadow-xs overflow-hidden">
-        <CardHeader className="pb-3 border-b border-slate-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-teal-600" />
-                Danh Sách Tiếp Đón & Lịch Hẹn Gần Đây
-              </CardTitle>
-              <CardDescription className="text-xs text-slate-500">
-                5 bản ghi mới nhất được lưu trong bảng `appointments`
-              </CardDescription>
-            </div>
-            <Link to="/appointments">
-              <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
-                Xem tất cả lịch hẹn
-                <ChevronRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {stats?.recentAppointments && stats.recentAppointments.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
-                  <tr>
-                    <th className="py-2.5 px-4 font-mono">Mã Hẹn</th>
-                    <th className="py-2.5 px-4">Bệnh nhân</th>
-                    <th className="py-2.5 px-4">Bác sĩ phụ trách</th>
-                    <th className="py-2.5 px-4">Chuyên khoa</th>
-                    <th className="py-2.5 px-4">Ngày / Giờ</th>
-                    <th className="py-2.5 px-4">Lý do khám</th>
-                    <th className="py-2.5 px-4 text-center">Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
-                  {stats.recentAppointments.map((apt) => (
-                    <tr key={apt.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-4 font-mono font-semibold text-teal-800">
-                        {apt.appointmentCode}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="font-semibold text-slate-900">{apt.patientName || '—'}</div>
-                        {apt.patientCode && (
-                          <div className="font-mono text-[10px] text-slate-400">[{apt.patientCode}]</div>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 font-medium text-slate-800">
-                        {apt.doctorName || 'Chưa chỉ định'}
-                      </td>
-                      <td className="py-3 px-4 text-slate-600">
-                        {apt.specialtyName || 'Đa khoa'}
-                      </td>
-                      <td className="py-3 px-4 font-mono text-[11px] text-slate-600">
-                        <div>{formatDate(apt.appointmentDate)}</div>
-                        <div className="text-[10px] text-slate-400">{apt.appointmentTime}</div>
-                      </td>
-                      <td className="py-3 px-4 text-slate-500 max-w-xs truncate" title={apt.reason}>
-                        {apt.reason || 'Khám bệnh'}
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <Badge
-                          variant={
-                            apt.status === 'COMPLETED'
-                              ? 'success'
-                              : apt.status === 'CHECKED_IN'
-                              ? 'warning'
-                              : apt.status === 'CANCELLED'
-                              ? 'destructive'
-                              : 'default'
-                          }
-                          className="text-[10px] font-mono"
-                        >
-                          {apt.status === 'COMPLETED'
-                            ? 'Đã khám'
-                            : apt.status === 'CHECKED_IN'
-                            ? 'Đã đến'
-                            : apt.status === 'CANCELLED'
-                            ? 'Đã hủy'
-                            : apt.status === 'CONFIRMED'
-                            ? 'Đã xác nhận'
-                            : apt.status}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="py-12 text-center text-xs text-slate-400 italic">
-              Chưa có lịch hẹn nào gần đây.
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* 6. System & Infrastructure Integrity Footer */}
-      <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-xs text-slate-600 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center shrink-0">
-            <Database className="h-4 w-4" />
-          </div>
-          <div>
-            <div className="font-semibold text-slate-800">
-              Trạng thái CSDL: MySQL 8.0/8.4 LTS • Flyway Version: v7
-            </div>
-            <div className="text-[11px] text-slate-500">
-              Mã hóa UTF-8 (utf8mb4), kiểm soát ACID transaction và toàn vẹn dữ liệu
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          <Badge variant="success" className="gap-1 py-0.5 px-2 text-[10px]">
-            <CheckCircle2 className="h-3 w-3" />
-            Backend Port 8080 Active
-          </Badge>
-          <Badge variant="outline" className="text-[10px] font-mono">
-            Spring Boot 3.3.5
-          </Badge>
         </div>
       </div>
 

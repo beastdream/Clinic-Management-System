@@ -50,6 +50,9 @@ public enum ErrorCode {
     INVOICE_CANNOT_BE_CANCELLED("INVOICE_CANNOT_BE_CANCELLED", "Không thể hủy hóa đơn đã thanh toán", HttpStatus.BAD_REQUEST),
     SERVICE_PRICE_NOT_FOUND("SERVICE_PRICE_NOT_FOUND", "Không tìm thấy bảng giá khả dụng cho dịch vụ yêu cầu", HttpStatus.NOT_FOUND),
     INVALID_PAYMENT_AMOUNT("INVALID_PAYMENT_AMOUNT", "Số tiền thanh toán không hợp lệ", HttpStatus.BAD_REQUEST),
+    // System & Admin domain errors
+    USER_NOT_FOUND("USER_NOT_FOUND", "Không tìm thấy tài khoản người dùng yêu cầu", HttpStatus.NOT_FOUND),
+    SYSTEM_MAINTENANCE_MODE("SYSTEM_MAINTENANCE_MODE", "Hệ thống đang trong chế độ bảo trì định kỳ. Vui lòng quay lại sau", HttpStatus.SERVICE_UNAVAILABLE),
     INVALID_STATE_TRANSITION("INVALID_STATE_TRANSITION", "Trạng thái nghiệp vụ chuyển đổi không hợp lệ", HttpStatus.BAD_REQUEST);
 
     private final String code;
