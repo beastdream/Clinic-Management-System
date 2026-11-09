@@ -41,6 +41,7 @@
 | 2.12| Bệnh nhân tự đăng ký tài khoản Portal (`POST /api/v1/auth/register`, trang `/register`): tạo User `ROLE_PATIENT` + hồ sơ bệnh nhân + liên kết 1-1, ghi audit | PATIENT | `COMPLETE` |
 | 2.14| Xác thực email khi bệnh nhân đăng ký (Flyway `V8`, token SHA-256 hết hạn 24h, gửi lại có giới hạn 60s, chặn đăng nhập khi chưa xác thực) | PATIENT | `COMPLETE` |
 | 2.15| Đăng ký / đăng nhập bằng Google (Google Identity Services, xác minh ID token ở backend, bổ sung hồ sơ lần đầu, chặn tài khoản nhân viên) | PATIENT | `COMPLETE` (cần cấu hình `GOOGLE_CLIENT_ID`) |
+| 2.16| Bảng điều khiển riêng cho Tiếp tân (hàng chờ tiếp đón hôm nay, nút Tiếp đón) và Thu ngân (đã thu / chờ thu, hóa đơn chờ thanh toán); sidebar & route `/appointments` cho Tiếp tân; cho Tiếp tân/Thu ngân tra cứu nhanh bệnh nhân (`GET /patients/top`) | RECEPTIONIST, CASHIER | `COMPLETE` |
 | 2.13| Ghi audit đăng nhập (LOGIN / LOGIN_FAILED / ACCOUNT_LOCKED) & sửa lỗi rollback khiến không lưu số lần đăng nhập sai | Tất cả | `COMPLETE` |
 
 ---

@@ -10,7 +10,9 @@ import {
   Layers,
   UserCog,
   ShieldAlert,
-  BarChart3
+  BarChart3,
+  CalendarCheck,
+  Receipt
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { authService } from '@/services/authService';
@@ -36,6 +38,25 @@ const navGroups: NavGroup[] = [
         name: 'Bảng Điều Khiển', 
         href: '/', 
         icon: LayoutDashboard,
+      },
+    ],
+  },
+  {
+    groupTitle: 'Tiếp Đón & Thu Ngân',
+    items: [
+      {
+        name: 'Lịch hẹn & Tiếp đón',
+        href: '/appointments',
+        icon: CalendarCheck,
+        badge: 'Tiếp tân',
+        allowedRoles: ['ROLE_RECEPTIONIST'],
+      },
+      {
+        name: 'Thu ngân & Viện phí',
+        href: '/billing',
+        icon: Receipt,
+        badge: 'Thu ngân',
+        allowedRoles: ['ROLE_CASHIER'],
       },
     ],
   },

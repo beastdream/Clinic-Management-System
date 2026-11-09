@@ -74,8 +74,8 @@ public class PatientController {
     }
 
     @GetMapping("/top")
-    @PreAuthorize("hasRole('DOCTOR')")
-    @Operation(summary = "Lấy nhanh danh sách bệnh nhân", description = "Chỉ cho phép Bác sĩ tra cứu danh sách bệnh nhân")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'RECEPTIONIST', 'CASHIER')")
+    @Operation(summary = "Lấy nhanh danh sách bệnh nhân", description = "Tra cứu nhanh bệnh nhân để chọn khi khám, đặt lịch hẹn (Tiếp tân) hoặc lập hóa đơn (Thu ngân)")
     public ResponseEntity<ApiResponse<List<PatientResponse>>> getTopPatients(
             @RequestParam(required = false) String search
     ) {
