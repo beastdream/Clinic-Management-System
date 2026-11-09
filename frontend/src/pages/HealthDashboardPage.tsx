@@ -29,10 +29,18 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/LoadingSkeleton';
 import { formatDate } from '@/lib/utils';
+import { ReceptionistDashboard } from '@/pages/receptionist/ReceptionistDashboard';
+import { CashierDashboard } from '@/pages/cashier/CashierDashboard';
 
 export const HealthDashboardPage: React.FC = () => {
   const currentUser = authService.getCurrentUser();
   const currentRole = currentUser?.roles?.[0]?.replace('ROLE_', '') || 'GUEST';
+  const hasRole = (role: string) =>
+    (currentUser?.roles ?? []).some((r) => r.toUpperCase().replace('ROLE_', '') === role);
+  const isReceptionist = hasRole('RECEPTIONIST');
+  const isCashier = hasRole('CASHIER');
+  // Tiếp tân / Thu ngân có bảng điều khiển riêng; Bác sĩ & Admin giữ giao diện tổng quan bên dưới
+  const isFrontDesk = (isReceptionist || isCashier) && !hasRole('DOCTOR') && !hasRole('ADMIN');
 
   const {
     data: statsResponse,
@@ -45,6 +53,7 @@ export const HealthDashboardPage: React.FC = () => {
     queryKey: ['dashboard', 'stats'],
     queryFn: dashboardService.getStats,
     refetchInterval: 30000, // Refresh every 30 seconds
+    enabled: !isFrontDesk,
   });
 
   const stats = statsResponse?.data;
@@ -64,6 +73,40 @@ export const HealthDashboardPage: React.FC = () => {
     month: '2-digit',
     year: 'numeric',
   }).format(new Date());
+
+  if (isFrontDesk) {
+    const roleTitle = isReceptionist && isCashier
+      ? 'Tiếp Tân & Thu Ngân'
+      : isReceptionist ? 'Tiếp Tân' : 'Thu Ngân';
+    return (
+      <div className="space-y-6 animate-in fade-in duration-200">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-800 via-teal-700 to-slate-800 p-6 md:p-8 text-white shadow-lg">
+          <div className="relative z-10 space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-teal-200">
+              <CalendarCheck className="h-4 w-4" />
+              <span>{todayFormatted}</span>
+              <span className="text-teal-300">•</span>
+              <span>Quầy {roleTitle}</span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+              Xin chào, {currentUser?.fullName || currentUser?.username}
+            </h1>
+            <p className="text-sm text-teal-100 max-w-2xl leading-relaxed">
+              {isReceptionist && isCashier
+                ? 'Tiếp đón bệnh nhân theo lịch hẹn và thu viện phí trong ngày.'
+                : isReceptionist
+                  ? 'Tiếp đón bệnh nhân theo lịch hẹn, theo dõi hàng chờ khám trong ngày.'
+                  : 'Theo dõi hóa đơn chờ thanh toán và số tiền đã thu.'}
+            </p>
+          </div>
+          <div className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-white/5 pointer-events-none" />
+        </div>
+
+        {isReceptionist && <ReceptionistDashboard />}
+        {isCashier && <CashierDashboard />}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">

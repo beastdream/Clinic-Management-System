@@ -9,6 +9,7 @@ import { VerifyEmailPage } from '@/pages/auth/VerifyEmailPage';
 import { GoogleCompleteProfilePage } from '@/pages/auth/GoogleCompleteProfilePage';
 import { HealthDashboardPage } from '@/pages/HealthDashboardPage';
 import { PatientsPage } from '@/pages/PatientsPage';
+import { AppointmentsPage } from '@/pages/AppointmentsPage';
 import { DoctorsPage } from '@/pages/DoctorsPage';
 import { ClinicalEncountersPage } from '@/pages/clinical/ClinicalEncountersPage';
 import { BillingInvoicesPage } from '@/pages/billing/BillingInvoicesPage';
@@ -49,10 +50,14 @@ export const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Lịch hẹn & tiếp đón: Đã loại bỏ đối với Quản trị viên */}
+        {/* Lịch hẹn & tiếp đón: CHỈ TIẾP TÂN (Quản trị viên không thao tác nghiệp vụ tiếp đón) */}
         <Route
           path="appointments"
-          element={<Navigate to="/" replace />}
+          element={
+            <RoleGuard allowedRoles={['ROLE_RECEPTIONIST']}>
+              <AppointmentsPage />
+            </RoleGuard>
+          }
         />
 
         {/* Danh sách bác sĩ & chuyên khoa: Mọi vai trò nội bộ */}
